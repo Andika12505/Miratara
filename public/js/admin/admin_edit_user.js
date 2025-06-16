@@ -1,5 +1,5 @@
-// JavaScript untuk Admin Add User Page
-// File: public/js/admin/admin_add_user.js
+// JavaScript untuk Admin Edit User Page
+// File: public/js/admin/admin_edit_user.js
 
 // --- Variabel Global ---
 // Diinisialisasi di DOMContentLoaded
@@ -31,50 +31,10 @@ window.togglePassword = function (fieldId) {
  * Mereset form setelah konfirmasi.
  */
 window.resetForm = function () {
-    if (
-        confirm(
-            "Apakah Anda yakin ingin mereset form? Semua data yang diisi akan hilang."
-        )
-    ) {
-        const form = document.getElementById("addUserForm");
-        form.reset();
-
-        // Reset validation states
-        Object.keys(validationState).forEach((key) => {
-            if (key === "phone") {
-                validationState[key] = true;
-            } else {
-                validationState[key] = false;
-            }
-        });
-
-        // Reset field styles
-        const fieldsArray = Object.values(fields);
-        fieldsArray.forEach((field) => {
-            if (field) { // Tambahkan cek null
-                field.classList.remove("is-valid", "is-invalid");
-                if (field.nextElementSibling && field.nextElementSibling.classList.contains("invalid-feedback")) {
-                    field.nextElementSibling.textContent = "";
-                }
-            }
-        });
-
-        // Reset password requirements
-        const passwordReqsArray = Object.values(passwordReqs);
-        passwordReqsArray.forEach((req) => {
-            if (req) { // Tambahkan cek null
-                req.classList.remove("valid", "invalid");
-            }
-        });
-
-        // Pastikan checkbox is_admin juga direset
-        if (fields.isAdmin) { // Cek apakah elemen ada
-            fields.isAdmin.checked = false; 
-        }
-
-
-        clearAlert();
-        updateSubmitButton();
+    // Di halaman edit, reset berarti memuat ulang data awal dari server
+    if (confirm("Apakah Anda yakin ingin mereset form? Semua perubahan yang belum disimpan akan hilang.")) {
+        // Cukup refresh halaman untuk memuat ulang data asli dari server
+        window.location.reload(); 
     }
 };
 
@@ -109,10 +69,9 @@ function clearAlert() {
 }
 
 // --- DOMContentLoaded Listener (Kode utama yang berjalan setelah DOM siap) ---
-
 document.addEventListener("DOMContentLoaded", function () {
     // Form elements
-    const form = document.getElementById("addUserForm");
+    const form = document.getElementById("editUserForm");
     const submitBtn = document.getElementById("submitBtn");
     const btnText = submitBtn ? submitBtn.querySelector(".btn-text") : null;
     const btnLoader = submitBtn ? submitBtn.querySelector(".btn-loader") : null;
@@ -136,13 +95,15 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Validation state
+    // Initial validation state, username/email/phone dimulai sebagai valid
+    // karena mereka sudah ada di database (kecuali kosong/berubah menjadi duplikat)
     validationState = { // Inisialisasi di sini
-        fullName: false,
-        username: false,
-        email: false,
-        phone: true, // Phone is optional
-        password: false,
-        isAdmin: true, // Default true (optional field)
+        fullName: true, // Asumsi nama sudah benar dari DB
+        username: true,
+        email: true,
+        phone: true, 
+        password: true, // Password opsional saat update, jadi true by default
+        isAdmin: true, // Default true
     };
 
     // Debounce function untuk API calls
@@ -168,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 field.nextElementSibling.textContent = "";
             }
         } else {
-            field.classList.remove("is-valid");
+            field.classList.remove("is-invalid");
             field.classList.add("is-invalid");
             if (field.nextElementSibling && field.nextElementSibling.classList.contains("invalid-feedback")) {
                 field.nextElementSibling.textContent = message;
@@ -203,14 +164,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            // Mengambil token terbaru setiap kali sebelum permintaan
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content; 
             const response = await fetch("/admin/check-availability", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken
+                    "X-CSRF-TOKEN": csrfToken 
                 },
-                body: JSON.stringify({ type: "username", value: username }),
+                body: JSON.stringify({ type: "username", value: username, ignore_id: window.currentUserId }), 
             });
 
             const data = await response.json();
@@ -222,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (error) {
             console.error("Error checking username:", error);
-            validationState.username = validateField(fields.username, true);
+            validationState.username = validateField(fields.username, true); // Asumsi valid jika error API
         }
         updateSubmitButton();
     }, 500);
@@ -247,14 +209,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const checkEmailAvailability = debounce(async function (email) {
         if (!fields.email) return;
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content; // Mengambil token terbaru
             const response = await fetch("/admin/check-availability", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken
+                    "X-CSRF-TOKEN": csrfToken 
                 },
-                body: JSON.stringify({ type: "email", value: email }),
+                body: JSON.stringify({ type: "email", value: email, ignore_id: window.currentUserId }), 
             });
 
             const data = await response.json();
@@ -266,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (error) {
             console.error("Error checking email:", error);
-            validationState.email = validateField(fields.email, true);
+            validationState.email = validateField(fields.email, true); // Asumsi valid jika error API
         }
         updateSubmitButton();
     }, 500);
@@ -308,23 +270,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Password validation and strength check
     function validatePassword() {
         if (!fields.password) return;
-        const value = fields.password.value;
+        const value = fields.password.value; // Dapatkan nilai password di sini
         const requirements = {
-            length: value.length >= 8 && value.length <= 20,
-            capital: /[A-Z]/.test(value),
-            number: /\d/.test(value),
-            special: /[@!$#%^<>?_-]/.test(value),
+            length: value.length === 0 || (value.length >= 8 && value.length <= 20), // Optional if empty
+            capital: value.length === 0 || /[A-Z]/.test(value),
+            number: value.length === 0 || /\d/.test(value),
+            special: value.length === 0 || /[@!$#%^<>?_-]/.test(value),
         };
 
         updatePasswordRequirement("length", requirements.length);
         updatePasswordRequirement("capital", requirements.capital);
-        updatePasswordRequirement("number", requirements.number);
+        updatePasswordRequirement("number", requirements.number); // FIX: Corrected typo
         updatePasswordRequirement("special", requirements.special);
 
         const allRequirementsMet = Object.values(requirements).every(Boolean);
 
-        if (value === "") {
-            validationState.password = validateField(fields.password, false, "Password harus diisi");
+        if (value === "") { // Password is optional for edit, so if empty it's valid for this check
+            validationState.password = validateField(fields.password, true);
         } else if (!allRequirementsMet) {
             validationState.password = validateField(fields.password, false, "Password belum memenuhi semua persyaratan");
         } else {
@@ -370,16 +332,26 @@ document.addEventListener("DOMContentLoaded", function () {
     if (fields.password) fields.password.addEventListener("input", validatePassword);
     if (fields.password) fields.password.addEventListener("blur", validatePassword);
 
+    // Initial validation check on load (to enable/disable submit button)
+    validateFullName();
+    validateUsername();
+    validateEmail();
+    validatePhone();
+    validatePassword(); // Re-evaluate password requirements on load
+    updateSubmitButton(); // Call explicitly to set initial state
+
     // Form submission
     if (form) {
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
 
+            // Re-validate all fields before submit
             validateFullName();
             validateUsername();
             validateEmail();
             validatePhone();
             validatePassword();
+            // isAdmin is a checkbox, no complex validation needed here unless specific rules apply
 
             const allValid = Object.values(validationState).every(Boolean);
 
@@ -399,26 +371,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 // PENTING: Untuk checkbox 'is_admin', FormData hanya mengirim 'on' jika dicentang.
                 // Kita perlu secara eksplisit mengirim 1 atau 0 untuk validasi 'boolean' Laravel.
                 // Ini akan memastikan is_admin selalu 0 jika checkbox tidak dicentang, atau 1 jika dicentang.
-                // Asumsi ada elemen dengan id "is_admin" di form create user
-                if (fields.isAdmin) {
-                    formData.set('is_admin', fields.isAdmin.checked ? '1' : '0'); 
-                } else {
-                    // Jika tidak ada checkbox is_admin di form tambah user (misal user biasa), default ke 0
-                    formData.set('is_admin', '0'); 
-                }
-
+                formData.set('is_admin', fields.isAdmin.checked ? '1' : '0'); 
 
                 // Mengambil CSRF token terbaru sebelum setiap permintaan
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').content; 
 
                 // Menambahkan CSRF token ke FormData sebagai fallback (penting untuk 419)
-                formData.set('_token', csrfToken); 
+                formData.set('_token', csrfToken); // Tambahkan ini
 
-                // Fetch API untuk POST method
-                const response = await fetch("/admin/users", { // URL untuk store user
-                    method: "POST", 
+
+                // Fetch API untuk PUT method
+                // URL diambil dari action form (sudah di set di Blade, misal: /admin/users/{id})
+                const url = form.action; 
+
+                const response = await fetch(url, {
+                    method: "POST", // Method fetch akan dikirim sebagai POST, lalu Laravel akan membaca @method('PUT')
                     headers: {
-                        "X-CSRF-TOKEN": csrfToken, 
+                        "X-CSRF-TOKEN": csrfToken, // Menggunakan token yang baru diambil
+                        // "Content-Type": "application/json" TIDAK DIGUNAKAN dengan FormData karena pakai FormData
                     },
                     body: formData,
                 });
@@ -426,8 +396,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Penting: Handle respons 419 (Page Expired) atau non-JSON
                 if (response.status === 419) {
                     showAlert("Sesi Anda telah kedaluwarsa. Mohon refresh halaman dan coba lagi.", "danger");
+                    // Opsi: refresh halaman secara otomatis
                     setTimeout(() => { window.location.reload(); }, 3000);
-                    return;
+                    return; // Hentikan eksekusi lebih lanjut
                 }
 
                 // Coba parse JSON, tapi tangkap jika bukan JSON (misal, halaman error HTML)
@@ -437,35 +408,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (data.success) {
                         showAlert(data.message, "success");
-                        console.log("Preparing to redirect. Target URL:", window.adminUserIndexUrl);
+                        // Tambahkan log untuk debugging
+                        console.log("Preparing to redirect. Target URL:", window.adminUserIndexUrl); 
 
                         setTimeout(() => {
-                            console.log("Executing redirect to:", window.adminUserIndexUrl);
-                            window.location.href = window.adminUserIndexUrl;
+                            console.log("Executing redirect to:", window.adminUserIndexUrl); // Tambahkan log di sini
+                            window.location.href = window.adminUserIndexUrl; // Redirect ke halaman index
                         }, 2000);
                     } else {
+                        // Jika ada error validasi spesifik dari backend (HTTP 422)
                         if (response.status === 422 && data.errors) {
                             for (const fieldName in data.errors) {
+                                // Coba temukan field di objek `fields`
                                 if (fields[fieldName]) {
                                     validateField(fields[fieldName], false, data.errors[fieldName][0]);
-                                } else {
+                                }
+                                // Tambahan: jika error bukan dari field yang langsung divalidasi (misal error server general)
+                                else {
                                     console.error(`Error for unknown field: ${fieldName}`, data.errors[fieldName]);
                                 }
                             }
                             showAlert(data.message || "Validasi gagal dari server. Periksa kembali input Anda.", "danger");
                         } else {
-                            showAlert(data.message || "Terjadi kesalahan saat menambah user. Silakan coba lagi.", "danger");
+                            showAlert(data.message || "Terjadi kesalahan saat menyimpan perubahan. Silakan coba lagi.", "danger");
                         }
                     }
                 } else {
+                    // Respons bukan JSON, kemungkinan halaman error HTML
                     const textError = await response.text();
                     console.error("Non-JSON response received:", textError);
                     showAlert("Terjadi kesalahan server. Mohon periksa konsol untuk detailnya.", "danger");
                 }
 
             } catch (error) {
-                console.error("Add user error:", error);
-                showAlert("Terjadi kesalahan jaringan saat menambah user. Silakan coba lagi.", "danger");
+                console.error("Edit user error:", error);
+                showAlert("Terjadi kesalahan jaringan saat menyimpan perubahan. Silakan coba lagi.", "danger");
             } finally {
                 if (btnText) btnText.classList.remove("d-none");
                 if (btnLoader) btnLoader.classList.add("d-none");
@@ -474,13 +451,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Initial load
-    // Karena ini form baru, tidak ada data awal yang perlu divalidasi kecuali validasi kosong
-    // sehingga tombol submit awalnya mungkin disabled sampai form mulai diisi
+    // Set initial validation state based on current field values
+    // This makes sure the submit button is correctly enabled/disabled on page load
+    // These functions also handle initial styling for valid/invalid
     validateFullName();
     validateUsername();
     validateEmail();
     validatePhone();
-    validatePassword();
-    updateSubmitButton();
+    validatePassword(); // Re-evaluate password requirements on load
+    updateSubmitButton(); // Call explicitly to set initial state
+
 });

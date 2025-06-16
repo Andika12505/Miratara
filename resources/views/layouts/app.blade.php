@@ -75,21 +75,20 @@
 
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link @if(Request::routeIs('admin.dashboard')) active @endif" href="{{ route('admin.dashboard') }}">
-                  <i class="fas fa-tachometer-alt me-2"></i>
-                  Dashboard
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link @if(Request::routeIs('admin.users.*')) active @endif" href="{{ route('admin.users.index_page') }}">
+                <a class="nav-link @if(Request::routeIs('admin.users.*')) active @endif" href="{{ route('admin.users.index') }}">
                   <i class="fas fa-users me-2"></i>
                   Kelola User
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link @if(Request::routeIs('admin.products.*')) active @endif" href="{{ route('admin.products.index_page') }}">
-                    <i class="fas fa-tshirt me-2"></i> {{-- Icon untuk produk --}}
-                    Kelola Produk
+                <a class="nav-link @if(Request::routeIs('admin.users.*')) active @endif" href="{{ route('admin.users.index') }}">
+                  <i class="fas fa-users me-2"></i>
+                  Kelola User
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link @if(Request::routeIs('admin.products.*')) active @endif" href="{{ route('admin.products.index') }}">
+                <i class="fas fa-box-open me-2"></i> Kelola Produk
                 </a>
               </li>
               <li><hr class="dropdown-divider"></li>

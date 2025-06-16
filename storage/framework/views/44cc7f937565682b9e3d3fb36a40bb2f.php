@@ -1,8 +1,6 @@
-@extends('admin.layouts.app')
+<?php $__env->startSection('title', 'Tambah User - Admin MiraTara'); ?>
 
-@section('title', 'Tambah User - Admin MiraTara')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="page-header mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -12,7 +10,7 @@
                 </p>
             </div>
             <div>
-                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                <a href="<?php echo e(route('admin.users.index')); ?>" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>
                     Kembali ke Daftar User
                 </a>
@@ -33,7 +31,7 @@
                 </div>
                 <div class="card-body">
                     <form id="addUserForm" action="#" method="POST" novalidate>
-                        @csrf
+                        <?php echo csrf_field(); ?>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -127,7 +125,7 @@
                                 </button>
                             </div>
                             <div>
-                                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary me-2">
+                                <a href="<?php echo e(route('admin.users.index')); ?>" class="btn btn-outline-secondary me-2">
                                     <i class="fas fa-times me-2"></i> Batal
                                 </a>
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
@@ -174,12 +172,14 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
     <script>
         // Variabel JS global untuk URL redirect setelah sukses
-        window.adminUserIndexUrl = "{{ route('admin.users.index') }}";
+        window.adminUserIndexUrl = "<?php echo e(route('admin.users.index')); ?>";
     </script>
-    <script src="{{ asset('js/admin/admin_add_user.js') }}"></script>
-@endpush
+    <script src="<?php echo e(asset('js/admin/admin_add_user.js')); ?>"></script>
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('admin.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/jerenovvidimy/Documents/Shibal/RudalJawa/resources/views/admin/users/create.blade.php ENDPATH**/ ?>

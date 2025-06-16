@@ -8,13 +8,18 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage; // Digunakan jika ada fitur upload file di UserController, tapi saat ini tidak ada.
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View; // Untuk method yang mengembalikan view
+use Illuminate\Http\JsonResponse; // Untuk method yang mengembalikan JSON response
+use Illuminate\Http\RedirectResponse; // Untuk redirect
 
 class UserController extends Controller
 {
     /**
      * Mengambil daftar user dengan paginasi dan pencarian.
      * Digunakan oleh public/js/admin/admin_users.js
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse  <-- UBAH INI
      */
     public function getUsersJson(Request $request)
     {
@@ -37,136 +42,213 @@ class UserController extends Controller
         $users = $usersQuery->orderBy('created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
 
         // Format data untuk respons JSON ke frontend JavaScript
-         $formattedUsers = $users->map(function($user) {
+        $formattedUsers = $users->map(function($user) {
             return [
-              'id' => $user->id,
-              'full_name' => htmlspecialchars($user->full_name),
-              'username' => htmlspecialchars($user->username),
-              'email' => htmlspecialchars($user->email),
-              'phone' => $user->phone ? htmlspecialchars($user->phone) : '-', // Tampilkan '-' jika nomor telepon kosong
-              'created_at' => $user->created_at->format('d/m/Y H:i') // Format tanggal menggunakan Carbon
-          ];
+                'id' => $user->id,
+                'full_name' => htmlspecialchars($user->full_name),
+                'username' => htmlspecialchars($user->username),
+                'email' => htmlspecialchars($user->email),
+                'phone' => $user->phone ? htmlspecialchars($user->phone) : '-',
+                'created_at' => $user->created_at->format('d/m/Y H:i')
+            ];
         });
 
         // Kembalikan respons dalam format JSON
-        //return view('index', compact('users', 'search'));
         return response()->json([
-          'success' => true,
-          'data' => $formattedUsers,
-          'pagination' => [
-              'current_page' => $users->currentPage(),
-              'total_pages' => $users->lastPage(),
-              'total_users' => $users->total(),
-              'showing_from' => $users->firstItem(),
-              'showing_to' => $users->lastItem(),
-              'per_page' => $users->perPage()
-          ],
-          'search' => $search
+            'success' => true,
+            'data' => $formattedUsers,
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'total_pages' => $users->lastPage(),
+                'total_users' => $users->total(),
+                'showing_from' => $users->firstItem(),
+                'showing_to' => $users->lastItem(),
+                'per_page' => $users->perPage()
+            ],
+            'search' => $search
         ]);
     }
 
     /**
+     * Menampilkan daftar user di halaman index admin.
+     * Mengembalikan view yang akan memuat data via AJAX.
+     * @return \Illuminate\View\View  <-- UBAH INI
+     */
+    public function index()
+    {
+        return view('admin.users.index');
+    }
+
+    /**
+     * Menampilkan form untuk membuat user baru.
+     * @return \Illuminate\View\View  <-- UBAH INI
+     */
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    /**
      * Menyimpan user baru ke database.
-     * Digunakan oleh public/js/admin/admin_add_user.js
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse  <-- UBAH INI
      */
     public function store(Request $request)
     {
-        // Aturan validasi untuk setiap field yang diterima dari form
         $validator = Validator::make($request->all(), [
             'full_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]{2,50}$/'],
             'username' => ['required', 'string', 'min:3', 'max:20', 'unique:users,username', 'regex:/^[a-zA-Z0-9_]{3,20}$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'regex:/^(\+62|62|0)[2-9]\d{7,11}$/', 'unique:users,phone'],
             'password' => ['required', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@!$#%^<>?_-]).{8,20}$/'],
+            'is_admin' => ['nullable', 'boolean'], 
         ]);
 
-        // Jika validasi gagal, kembalikan respons error JSON
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . $validator->errors()->first() // Ambil pesan error pertama
-            ], 422); // HTTP 422 Unprocessable Entity
+                'message' => 'Validasi gagal: ' . $validator->errors()->first(),
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         try {
-            // Buat record user baru di tabel 'users'
             $user = User::create([
                 'full_name' => $request->full_name,
                 'username' => $request->username,
                 'email' => $request->email,
-                'phone' => !empty($request->phone) ? $request->phone : null, // Set null jika input phone kosong
-                'password' => Hash::make($request->password), // Hash password sebelum disimpan
+                'phone' => !empty($request->phone) ? $request->phone : null,
+                'password' => Hash::make($request->password),
+                // is_admin diambil dari request: 1 jika dicentang, 0 jika tidak dicentang
+                'is_admin' => $request->has('is_admin') ? $request->boolean('is_admin') : false, 
             ]);
 
-            // Kembalikan respons sukses JSON
             return response()->json([
                 'success' => true,
                 'message' => "User '{$user->full_name}' berhasil ditambahkan.",
-                'user_data' => $user->only(['id', 'full_name', 'username', 'email']) // Hanya kirim data tertentu
+                'user_data' => $user->only(['id', 'full_name', 'username', 'email'])
             ]);
 
         } catch (\Exception $e) {
-            // Log error untuk debugging di sisi server
             \Log::error("Error adding user from admin: " . $e->getMessage(), ['exception' => $e]);
-            // Kembalikan respons error generic ke frontend
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menambah user. Silakan coba lagi.'
-            ], 500); // HTTP 500 Internal Server Error
+            ], 500);
         }
-    }
-    public function index() // Ini akan menjadi method untuk admin.users.index_page
-    {
-        return view('admin.users.index'); // Cukup return view tanpa data awal, karena data akan diambil via AJAX
     }
 
     /**
-     * Menghapus user dari database.
-     * Digunakan oleh public/js/admin/admin_users.js
+     * Menampilkan form untuk mengedit user yang spesifik.
+     *
+     * @param  \App\Models\User  $user  Instance model User (Route Model Binding)
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse  <-- UBAH INI (bisa return view atau redirect)
      */
-    public function destroy(Request $request)
+    public function edit(User $user)
     {
-        // Validasi user_id yang diterima dari permintaan
+        // Pastikan user tidak mengedit user 'admin' utama melalui form edit biasa jika tidak diinginkan
+        if ($user->username === 'admin') {
+            return redirect()->route('admin.users.index')->with('error', 'User admin utama tidak dapat diedit melalui form ini.');
+        }
+
+        // Mengembalikan view untuk form edit, dengan data user yang akan diedit
+        return view('admin.users.edit', compact('user'));
+    }
+
+    /**
+     * Memperbarui user yang spesifik di database.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\User  $user  Instance model User (Route Model Binding)
+     * @return \Illuminate\Http\JsonResponse  <-- UBAH INI
+     */
+    public function update(Request $request, User $user)
+    {
+        // Aturan validasi untuk memperbarui user
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|integer|exists:users,id' // Pastikan user_id adalah integer dan ada di tabel users
+            'full_name' => ['required', 'string', 'regex:/^[a-zA-Z\s]{2,50}$/'],
+            'username' => ['required', 'string', 'min:3', 'max:20', Rule::unique('users')->ignore($user->id), 'regex:/^[a-zA-Z0-9_]{3,20}$/'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => ['nullable', 'string', Rule::unique('users')->ignore($user->id), 'regex:/^(\+62|62|0)[2-9]\d{7,11}$/'],
+            'password' => ['nullable', 'string', 'min:8', 'max:20', 'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@!$#%^<>?_-]).{8,20}$/'],
+            
+            // PERUBAHAN DI SINI: 'is_admin' sekarang 'nullable' untuk update juga
+            'is_admin' => ['nullable', 'boolean'], 
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . $validator->errors()->first()
+                'message' => 'Validasi gagal: ' . $validator->errors()->first(),
+                'errors' => $validator->errors()
             ], 422);
         }
 
-        $user_id = $request->user_id;
+        // Mencegah perubahan role admin utama atau username-nya
+        if ($user->username === 'admin' && ($request->username !== 'admin' || ($request->has('is_admin') && !$request->boolean('is_admin')))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User admin utama tidak dapat diubah username-nya atau status admin-nya dicabut.'
+            ], 403);
+        }
 
         try {
-            $user = User::find($user_id);
-
-            // Cek jika user tidak ditemukan (meskipun 'exists' rule sudah cukup)
-            if (!$user) {
-                return response()->json(['success' => false, 'message' => 'User tidak ditemukan.'], 404);
+            $user->full_name = $request->full_name;
+            $user->username = $request->username;
+            $user->email = $request->email;
+            $user->phone = !empty($request->phone) ? $request->phone : null;
+            
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
             }
+            
+            // Logika untuk is_admin di update:
+            // Jika checkbox DICENTANG, is_admin akan di-set ke TRUE (1).
+            // Jika checkbox TIDAK DICENTANG, is_admin akan di-set ke FALSE (0).
+            // Ini adalah perilaku standar dari checkbox di Laravel ketika 'nullable|boolean' digunakan.
+            $user->is_admin = $request->has('is_admin') ? $request->boolean('is_admin') : false;
 
-            // Mencegah penghapusan user dengan username 'admin' (user utama admin)
-            if ($user->username === 'admin') { 
-                return response()->json(['success' => false, 'message' => 'User admin utama tidak dapat dihapus.'], 403);
-            }
+            $user->save();
 
-            // Hapus user dari database
+            return response()->json([
+                'success' => true,
+                'message' => "User '{$user->full_name}' berhasil diperbarui.",
+                'user_data' => $user->only(['id', 'full_name', 'username', 'email', 'is_admin'])
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error("Error updating user from admin: " . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui user. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Menghapus user yang spesifik dari database.
+     *
+     * @param  \App\Models\User  $user  Instance model User (Route Model Binding)
+     * @return \Illuminate\Http\JsonResponse  <-- UBAH INI
+     */
+    public function destroy(User $user)
+    {
+        // Mencegah penghapusan user dengan username 'admin' (user utama admin)
+        if ($user->username === 'admin') { 
+            return response()->json(['success' => false, 'message' => 'User admin utama tidak dapat dihapus.'], 403);
+        }
+
+        try {
             $user->delete();
 
-            // Kembalikan respons sukses JSON
             return response()->json([
                 'success' => true,
                 'message' => "User '{$user->full_name}' berhasil dihapus.",
                 'deleted_user' => $user->only(['id', 'username', 'full_name'])
             ]);
 
-        } catch (\Exception | \Throwable $e) { // Tangkap Exception atau Throwable
-            // Log error
+        } catch (\Exception | \Throwable $e) {
             \Log::error("Error deleting user from admin: " . $e->getMessage(), ['exception' => $e]);
-            // Kembalikan respons error
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menghapus user. Silakan coba lagi.'
@@ -176,14 +258,16 @@ class UserController extends Controller
 
     /**
      * Memeriksa ketersediaan username, email, atau phone untuk validasi unik.
-     * Digunakan oleh public/js/admin/admin_add_user.js
+     * Digunakan oleh public/js/admin/admin_add_user.js (dan juga akan digunakan oleh admin_edit_user.js)
+     * @param  \App\Models\User  $user  Instance model User (Route Model Binding)
+     * @return \Illuminate\Http\JsonResponse  <-- UBAH INI
      */
     public function checkAvailability(Request $request)
     {
-        // Aturan validasi untuk tipe dan nilai yang akan diperiksa
         $validator = Validator::make($request->all(), [
-            'type' => 'required|string|in:username,email,phone', // Hanya izinkan tipe tertentu
+            'type' => 'required|string|in:username,email,phone',
             'value' => 'required|string',
+            'ignore_id' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
@@ -192,11 +276,16 @@ class UserController extends Controller
 
         $type = $request->type;
         $value = trim($request->value);
+        $ignoreId = $request->ignore_id;
 
-        // Periksa apakah nilai sudah ada di tabel 'users' untuk tipe yang diberikan
-        $available = !User::where($type, $value)->exists();
+        $query = User::where($type, $value);
 
-        // Kembalikan status ketersediaan
+        if ($ignoreId) {
+            $query->where('id', '!=', $ignoreId);
+        }
+
+        $available = !$query->exists();
+
         return response()->json(['available' => $available]);
     }
 }

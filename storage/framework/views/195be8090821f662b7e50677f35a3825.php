@@ -1,18 +1,16 @@
-@extends('admin.layouts.app')
+<?php $__env->startSection('title', 'Edit User - Admin MiraTara'); ?>
 
-@section('title', 'Tambah User - Admin MiraTara')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="page-header mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="h3 mb-1">Tambah User Baru</h1>
+                <h1 class="h3 mb-1">Edit User</h1>
                 <p class="text-muted mb-0">
-                    Buat akun user baru untuk MiraTara
+                    Perbarui informasi user <?php echo e($user->full_name); ?>.
                 </p>
             </div>
             <div>
-                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                <a href="<?php echo e(route('admin.users.index')); ?>" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>
                     Kembali ke Daftar User
                 </a>
@@ -27,13 +25,15 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-user-plus me-2"></i>
-                        Informasi User Baru
+                        <i class="fas fa-user-edit me-2"></i>
+                        Informasi User
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form id="addUserForm" action="#" method="POST" novalidate>
-                        @csrf
+                    
+                    <form id="editUserForm" action="<?php echo e(route('admin.users.update', $user->id)); ?>" method="POST" novalidate>
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PUT'); ?> 
 
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -44,7 +44,7 @@
                                     <span class="input-group-text">
                                         <i class="fas fa-user"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="fullName" name="full_name" required />
+                                    <input type="text" class="form-control" id="fullName" name="full_name" value="<?php echo e(old('full_name', $user->full_name)); ?>" required />
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
@@ -57,7 +57,7 @@
                                     <span class="input-group-text">
                                         <i class="fas fa-at"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="username" name="username" required />
+                                    <input type="text" class="form-control" id="username" name="username" value="<?php echo e(old('username', $user->username)); ?>" required />
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                                     <span class="input-group-text">
                                         <i class="fas fa-envelope"></i>
                                     </span>
-                                    <input type="email" class="form-control" id="email" name="email" required />
+                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo e(old('email', $user->email)); ?>" required />
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
@@ -86,7 +86,7 @@
                                     <span class="input-group-text">
                                         <i class="fas fa-phone"></i>
                                     </span>
-                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="08123456789" />
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo e(old('phone', $user->phone)); ?>" placeholder="08123456789" />
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
@@ -95,13 +95,13 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="password" class="form-label">
-                                    Password <span class="text-danger">*</span>
+                                    Password (Kosongkan jika tidak ingin diubah)
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-lock"></i>
                                     </span>
-                                    <input type="password" class="form-control" id="password" name="password" required />
+                                    <input type="password" class="form-control" id="password" name="password" />
                                     <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password')">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -118,6 +118,14 @@
                                     </ul>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <label for="is_admin" class="form-label">Status</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin" value="1" <?php echo e(old('is_admin', $user->is_admin) ? 'checked' : ''); ?>>
+                                    <label class="form-check-label" for="is_admin">Jadikan Admin</label>
+                                </div>
+                                <small class="text-muted">Centang untuk memberikan hak akses admin.</small>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-between">
@@ -127,12 +135,13 @@
                                 </button>
                             </div>
                             <div>
-                                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary me-2">
-                                    <i class="fas fa-times me-2"></i> Batal
+                                <a href="<?php echo e(route('admin.users.index')); ?>" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Kembali ke Daftar User
                                 </a>
                                 <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <span class="btn-text">
-                                        <i class="fas fa-user-plus me-2"></i> Tambah User
+                                        <i class="fas fa-save me-2"></i> Simpan Perubahan
                                     </span>
                                     <span class="btn-loader d-none">
                                         <i class="fas fa-spinner fa-spin me-2"></i> Menyimpan...
@@ -143,43 +152,20 @@
                     </form>
                 </div>
             </div>
-
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        <i class="fas fa-info-circle text-info me-2"></i>
-                        Informasi Tambahan
-                    </h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ul class="list-unstyled small text-muted">
-                                <li>
-                                    • Field bertanda
-                                    <span class="text-danger">*</span> wajib diisi
-                                </li>
-                                <li>• Username harus unik (tidak boleh sama)</li>
-                                <li>• Email harus unik dan valid</li>
-                                <li>• Nomor telepon bersifat opsional</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <ul class="list-unstyled small text-muted">
-                                <li>• Password akan di-hash untuk keamanan</li>
-                                <li>• User dapat login langsung setelah dibuat</li>
-                                <li>• Data dapat diubah setelah user dibuat</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
+    
     <script>
         // Variabel JS global untuk URL redirect setelah sukses
-        window.adminUserIndexUrl = "{{ route('admin.users.index') }}";
+        window.adminUserIndexUrl = "<?php echo e(route('admin.users.index')); ?>";
+        // Variabel JS global untuk ID user yang sedang diedit (untuk checkAvailability)
+        window.currentUserId = <?php echo e($user->id); ?>;
     </script>
-    <script src="{{ asset('js/admin/admin_add_user.js') }}"></script>
-@endpush
+    <script src="<?php echo e(asset('js/admin/admin_edit_user.js')); ?>"></script>
+    
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('admin.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/jerenovvidimy/Documents/Shibal/RudalJawa/resources/views/admin/users/edit.blade.php ENDPATH**/ ?>

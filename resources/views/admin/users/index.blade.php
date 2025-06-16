@@ -8,13 +8,12 @@
             <div>
                 <h1 class="h3 mb-1">Kelola User</h1>
                 <p class="text-muted mb-0">
-                    Lihat dan kelola semua user terdaftar
+                    Lihat, tambah, edit, dan hapus user yang terdaftar di sistem.
                 </p>
             </div>
             <div>
-                <a href="{{ route('admin.users.create_page') }}" class="btn btn-primary">
-                    <i class="fas fa-user-plus me-2"></i>
-                    Tambah User Baru
+                <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i> Tambah User Baru
                 </a>
             </div>
         </div>
@@ -22,93 +21,58 @@
 
     <div id="alertContainer" class="mt-3"></div>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Cari berdasarkan nama, username, atau email..." id="searchInput">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-users me-2"></i>
-                    Daftar User
-                </h5>
-                <span class="badge bg-primary" id="totalBadge">Total: 0 user</span>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-table me-2"></i> Daftar User
+            </h5>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="Cari user...">
+                <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
-        <div class="card-body p-0">
+        <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table table-hover table-striped" id="usersTable">
+                    <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nama Lengkap</th>
-                            <th scope="col">Username</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Telepon</th>
-                            <th scope="col">Terdaftar</th>
-                            <th scope="col">Aksi</th>
+                            <th>ID</th>
+                            <th>Nama Lengkap</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Telepon</th>
+                            <th>Status</th>
+                            <th>Terdaftar Sejak</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody">
-                        <tr>
-                            <td colspan="7" class="text-center py-5">
-                                <div class="loading-state">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <p class="mt-3 text-muted">Memuat data user...</p>
-                                </div>
-                            </td>
-                        </tr>
+                    <tbody id="usersTableBody">
+                        {{-- Data user akan dimuat di sini oleh JavaScript --}}
                     </tbody>
                 </table>
             </div>
-        </div>
 
-        <div class="card-footer">
-            <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted" id="paginationInfo">Menampilkan 0 dari 0 data</small>
-                <nav>
-                    <ul class="pagination pagination-sm mb-0" id="paginationNav">
-                        </ul>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div id="paginationInfo"></div>
+                <nav id="paginationLinks">
+                    <ul class="pagination mb-0">
+                        {{-- Link paginasi akan dimuat di sini oleh JavaScript --}}
+                    </ul>
                 </nav>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i> Konfirmasi Hapus</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus user <strong id="userToDelete"></strong>?</p>
-                    <div class="alert alert-warning d-flex align-items-center">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <div><strong>Peringatan:</strong> Tindakan ini tidak dapat dibatalkan. Semua data user akan dihapus secara permanen.</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i> Batal</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete"><i class="fas fa-trash me-2"></i> Ya, Hapus User</button>
-                </div>
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
+    {{-- Variabel JS global untuk URL data user --}}
+    <script>
+        window.usersApiUrl = "{{ route('admin.users.data') }}";
+        window.editUserRoute = "{{ route('admin.users.edit', ':id') }}"; // Placeholder untuk ID
+        window.deleteUserRoute = "{{ route('admin.users.destroy', ':id') }}"; // Placeholder untuk ID
+    </script>
     <script src="{{ asset('js/admin/admin_users.js') }}"></script>
+    {{-- Jika Anda memiliki JS lain untuk halaman ini, tambahkan di sini --}}
 @endpush

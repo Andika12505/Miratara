@@ -15,14 +15,22 @@ class AdminMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {
-        // Cek apakah user sudah login DAN user memiliki kolom is_admin dengan nilai true
-        if (Auth::check() && Auth::user()->is_admin) {
-            return $next($request); // Lanjutkan permintaan
+{
+        // Debug: Cek status auth dan user
+        if (!Auth::check()) {
+            \Log::info('User not authenticated');
+            return redirect('/masuk')->with('error', 'Silakan login terlebih dahulu.');
         }
-
-        // Jika bukan admin atau belum login, redirect ke homepage atau halaman login
-        // Gunakan with() untuk flash pesan error ke session (bisa ditampilkan di Blade)
-        return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman admin.');
-    }
+        
+        $user = Auth::user();
+        \Log::info('User ID: ' . $user->id . ', is_admin: ' . $user->is_admin);
+        
+        if (!$user->is_admin) {
+            \Log::info('User is not admin');
+            return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman admin.');
+        }
+        
+        \Log::info('Admin access granted');
+        return $next($request);
+}
 }
