@@ -86,10 +86,16 @@
                   Kelola User
                 </a>
               </li>
+              <li class="nav-item @if(Request::routeIs('admin.categories.*')) active @endif">
+                <a class="nav-link" href="{{ route('admin.categories.index_page') }}">
+                  <i class="fas fa-tags me-2"></i> {{-- Menggunakan ikon tag --}}
+                  Kelola Kategori
+                </a>
+              </li>
               <li class="nav-item">
                 <a class="nav-link @if(Request::routeIs('admin.products.*')) active @endif" href="{{ route('admin.products.index_page') }}">
-                    <i class="fas fa-tshirt me-2"></i>
-                    Kelola Produk
+                  <i class="fas fa-tshirt me-2"></i>
+                  Kelola Produk
                 </a>
               </li>
               <li><hr class="dropdown-divider"></li>

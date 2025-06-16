@@ -86,16 +86,10 @@
                   Kelola User
                 </a>
               </li>
-              <li class="nav-item <?php if(Request::routeIs('admin.categories.*')): ?> active <?php endif; ?>">
-                <a class="nav-link" href="<?php echo e(route('admin.categories.index_page')); ?>">
-                  <i class="fas fa-tags me-2"></i> 
-                  Kelola Kategori
-                </a>
-              </li>
               <li class="nav-item">
                 <a class="nav-link <?php if(Request::routeIs('admin.products.*')): ?> active <?php endif; ?>" href="<?php echo e(route('admin.products.index_page')); ?>">
-                  <i class="fas fa-tshirt me-2"></i>
-                  Kelola Produk
+                    <i class="fas fa-tshirt me-2"></i> 
+                    Kelola Produk
                 </a>
               </li>
               <li><hr class="dropdown-divider"></li>
@@ -117,4 +111,4 @@
 
     <?php echo $__env->yieldPushContent('scripts'); ?>
   </body>
-</html><?php /**PATH /Users/jerenovvidimy/Documents/Shibal/RudalJawa/resources/views/admin/layouts/app.blade.php ENDPATH**/ ?>
+</html><?php /**PATH /Users/jerenovvidimy/Documents/Shibal/RudalJawa/resources/views/layouts/app.blade.php ENDPATH**/ ?>

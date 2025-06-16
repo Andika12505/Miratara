@@ -10,21 +10,27 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'category_id', // Ini yang baru, menggantikan 'category'
         'name',
         'slug',
         'description',
-        'image_url_1',
-        'image_url_2',
+        'image', // Ubah dari image_url_1/2 menjadi satu kolom image saja (jika di migrasi begitu)
         'price',
-        'discount_price',
-        'category',
         'stock',
+        'metadata', // Kolom JSON baru kita
         'is_active',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'discount_price' => 'decimal:2',
+        'stock' => 'integer', // Pastikan stock di-cast sebagai integer
         'is_active' => 'boolean',
+        'metadata' => 'array', // Ini adalah cast penting untuk kolom JSON
     ];
+
+    // Definisikan relasi ke model Category
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
