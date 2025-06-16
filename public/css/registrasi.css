@@ -1,0 +1,117 @@
+/* CSS untuk Form Registrasi MiraTara */
+/* File: css/register.css */
+
+/* Override navbar untuk center logo */
+.navbar-brand {
+  margin-right: 0 !important;
+}
+
+.container-fluid.d-flex.justify-content-center {
+  justify-content: center !important;
+}
+
+/* Button Pink */
+.btn-pink {
+  background-color: #ffc0cb;
+  border: none;
+  color: #000;
+  font-weight: 500;
+  padding: 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.btn-pink:hover {
+  background-color: #ff8fab;
+  color: #000;
+}
+
+/* Card Styling */
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+/* Form Control */
+.form-control {
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+.form-control:focus {
+  border-color: #ffc0cb;
+  box-shadow: 0 0 0 0.2rem rgba(255, 192, 203, 0.25);
+}
+
+/* Label */
+.form-label {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Password Requirements */
+.password-requirements {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.requirements-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+  margin-top: 5px;
+}
+
+.req-item {
+  padding: 2px 0;
+  font-size: 0.85rem;
+  position: relative;
+  padding-left: 20px;
+  transition: 0.3s;
+}
+
+.req-item:before {
+  content: "✗";
+  position: absolute;
+  left: 0;
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.req-item.valid:before {
+  content: "✓";
+  color: #28a745;
+}
+
+.req-item.valid {
+  color: #28a745;
+}
+
+.req-item.invalid {
+  color: #dc3545;
+}
+
+/* Password Error */
+.password-error .alert {
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+}
+
+/* Form Control States */
+.form-control.is-valid {
+  border-color: #28a745;
+}
+
+.form-control.is-invalid {
+  border-color: #dc3545;
+}

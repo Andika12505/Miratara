@@ -1,0 +1,76 @@
+/* CSS untuk Form Login MiraTara */
+/* File: css/login.css */
+
+/* Override navbar untuk center logo */
+.navbar-brand {
+  margin-right: 0;
+}
+
+.container-fluid.d-flex.justify-content-center {
+  justify-content: center;
+}
+
+/* Button Pink */
+.btn-pink {
+  background-color: #ffc0cb;
+  border: none;
+  color: #000;
+  font-weight: 500;
+  padding: 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.btn-pink:hover {
+  background-color: #ff8fab;
+  color: #000;
+}
+
+/* Card Styling */
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+/* Form Control */
+.form-control {
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+.form-control:focus {
+  border-color: #ffc0cb;
+  box-shadow: 0 0 0 0.2rem rgba(255, 192, 203, 0.25);
+}
+
+/* Label */
+.form-label {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Checkbox Styling */
+.form-check-input {
+  border-radius: 4px;
+}
+
+.form-check-input:checked {
+  background-color: #ffc0cb;
+  border-color: #ffc0cb;
+}
+
+.form-check-input:focus {
+  border-color: #ffc0cb;
+  box-shadow: 0 0 0 0.2rem rgba(255, 192, 203, 0.25);
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+a:hover {
+  color: #ff8fab !important;
+}
