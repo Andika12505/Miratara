@@ -43,7 +43,7 @@ window.loadUsers = async function () {
             params.append("search", currentSearch);
         }
 
-        const response = await fetch(`/api/admin/users?${params}`);
+        const response = await fetch(`/admin/users-data?${params}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -119,6 +119,140 @@ window.performDelete = async function (userId, userName) {
     }
 };
 
+function displayUsers(users) {
+    if (!tableBody) return;
+
+    if (users.length === 0) {
+        showEmptyState();
+        return;
+    }
+
+    let html = "";
+    users.forEach((user, index) => {
+        const rowNumber = (currentPage - 1) * perPage + index + 1;
+        html += `
+            <tr>
+                <td>${rowNumber}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar me-2">
+                            <i class="fas fa-user-circle fa-2x text-muted"></i>
+                           </div>
+                        <div>
+                            <div class="fw-medium">${user.full_name}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <code class="text-primary">${user.username}</code>
+                </td>
+                <td>${user.email}</td>
+                <td>${user.phone}</td>
+                <td>
+                    <small class="text-muted">${user.created_at}</small>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-warning" 
+                                onclick="editUser(${user.id})" 
+                                title="Edit User">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" 
+                                onclick="deleteUser(${user.id}, '${user.full_name}')" 
+                                title="Hapus User">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    tableBody.innerHTML = html;
+}
+
+function showEmptyState() {
+    if (!tableBody) return;
+    const message = currentSearch
+        ? `Tidak ada user yang ditemukan untuk pencarian "${currentSearch}"`
+        : "Belum ada user terdaftar";
+
+    const actionButton = currentSearch
+        ? `<button type="button" class="btn btn-secondary" onclick="clearSearch()">
+            <i class="fas fa-times me-2"></i>
+            Hapus Pencarian
+        </button>`
+        : `<a href="/admin/users/create" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>
+            Tambah User Pertama
+        </a>`;
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="7" class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">${message}</h5>
+                    <p class="text-muted">Data user akan muncul disini setelah ada yang mendaftar</p>
+                    ${actionButton}
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function showLoading() {
+    if (!tableBody) return;
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="7" class="text-center py-5">
+                <div class="loading-state">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Memuat data user...</p>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function updatePagination(pagination) {
+    if (!paginationInfo || !paginationNav) return;
+
+    paginationInfo.textContent = `Menampilkan ${pagination.showing_from || 0} sampai ${pagination.showing_to || 0} dari ${pagination.total_users || 0} data`;
+
+    let paginationHtml = "";
+    const prevDisabled = pagination.current_page <= 1 ? "disabled" : "";
+    paginationHtml += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" onclick="changePage(${pagination.current_page - 1})">Previous</a></li>`;
+
+    const startPage = Math.max(1, pagination.current_page - 2);
+    const endPage = Math.min(pagination.total_pages, pagination.current_page + 2);
+
+    if (startPage > 1) {
+        paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(1)">1</a></li>`;
+        if (startPage > 2) { paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`; }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const active = i === pagination.current_page ? "active" : "";
+        paginationHtml += `<li class="page-item ${active}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+    }
+
+    if (endPage < pagination.total_pages) {
+        if (endPage < pagination.total_pages - 1) { paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`; }
+        paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${pagination.total_pages})">${pagination.total_pages}</a></li>`;
+    }
+
+    const nextDisabled = pagination.current_page >= pagination.total_pages ? "disabled" : "";
+    paginationHtml += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" onclick="changePage(${pagination.current_page + 1})">Next</a></li>`;
+        
+    paginationNav.innerHTML = paginationHtml;
+}
+
+function updateTotalBadge(total) {
+    if (totalBadge) totalBadge.textContent = `Total: ${total} user`;
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     searchInput = document.querySelector('input[placeholder*="Cari berdasarkan"]');
@@ -141,138 +275,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function displayUsers(users) {
-        if (!tableBody) return;
-
-        if (users.length === 0) {
-            showEmptyState();
-            return;
-        }
-
-        let html = "";
-        users.forEach((user, index) => {
-            const rowNumber = (currentPage - 1) * perPage + index + 1;
-            html += `
-                <tr>
-                    <td>${rowNumber}</td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="user-avatar me-2">
-                                <i class="fas fa-user-circle fa-2x text-muted"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">${user.full_name}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <code class="text-primary">${user.username}</code>
-                    </td>
-                    <td>${user.email}</td>
-                    <td>${user.phone}</td>
-                    <td>
-                        <small class="text-muted">${user.created_at}</small>
-                    </td>
-                    <td>
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-warning" 
-                                    onclick="editUser(${user.id})" 
-                                    title="Edit User">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger" 
-                                    onclick="deleteUser(${user.id}, '${user.full_name}')" 
-                                    title="Hapus User">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        });
-        tableBody.innerHTML = html;
-    }
-
-    function showEmptyState() {
-        if (!tableBody) return;
-        const message = currentSearch
-            ? `Tidak ada user yang ditemukan untuk pencarian "${currentSearch}"`
-            : "Belum ada user terdaftar";
-
-        const actionButton = currentSearch
-            ? `<button type="button" class="btn btn-secondary" onclick="clearSearch()">
-                <i class="fas fa-times me-2"></i>
-                Hapus Pencarian
-            </button>`
-            : `<a href="/admin/users/create" class="btn btn-primary">
-                <i class="fas fa-user-plus me-2"></i>
-                Tambah User Pertama
-            </a>`;
-
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center py-5">
-                    <div class="empty-state">
-                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">${message}</h5>
-                        <p class="text-muted">Data user akan muncul disini setelah ada yang mendaftar</p>
-                        ${actionButton}
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-
-    function showLoading() {
-        if (!tableBody) return;
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center py-5">
-                    <div class="loading-state">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-3 text-muted">Memuat data user...</p>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-
-    function updatePagination(pagination) {
-        if (!paginationInfo || !paginationNav) return;
-
-        paginationInfo.textContent = `Menampilkan ${pagination.showing_from || 0} sampai ${pagination.showing_to || 0} dari ${pagination.total_users || 0} data`;
-
-        let paginationHtml = "";
-        const prevDisabled = pagination.current_page <= 1 ? "disabled" : "";
-        paginationHtml += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" onclick="changePage(${pagination.current_page - 1})">Previous</a></li>`;
-
-        const startPage = Math.max(1, pagination.current_page - 2);
-        const endPage = Math.min(pagination.total_pages, pagination.current_page + 2);
-
-        if (startPage > 1) {
-            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(1)">1</a></li>`;
-            if (startPage > 2) { paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`; }
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            const active = i === pagination.current_page ? "active" : "";
-            paginationHtml += `<li class="page-item ${active}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
-        }
-
-        if (endPage < pagination.total_pages) {
-            if (endPage < pagination.total_pages - 1) { paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`; }
-            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${pagination.total_pages})">${pagination.total_pages}</a></li>`;
-        }
-
-        const nextDisabled = pagination.current_page >= pagination.total_pages ? "disabled" : "";
-        paginationHtml += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" onclick="changePage(${pagination.current_page + 1})">Next</a></li>`;
-        
-        paginationNav.innerHTML = paginationHtml;
-    }
-
-    function updateTotalBadge(total) {
-        if (totalBadge) totalBadge.textContent = `Total: ${total} user`;
-    }
 });

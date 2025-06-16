@@ -16,7 +16,7 @@ class UserController extends Controller
      * Mengambil daftar user dengan paginasi dan pencarian.
      * Digunakan oleh public/js/admin/admin_users.js
      */
-    public function index(Request $request)
+    public function getUsersJson(Request $request)
     {
         $search = $request->query('search');
         $limit = $request->query('limit', 10);
@@ -37,30 +37,31 @@ class UserController extends Controller
         $users = $usersQuery->orderBy('created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
 
         // Format data untuk respons JSON ke frontend JavaScript
-        $formattedUsers = $users->map(function($user) {
+         $formattedUsers = $users->map(function($user) {
             return [
-                'id' => $user->id,
-                'full_name' => htmlspecialchars($user->full_name),
-                'username' => htmlspecialchars($user->username),
-                'email' => htmlspecialchars($user->email),
-                'phone' => $user->phone ? htmlspecialchars($user->phone) : '-', // Tampilkan '-' jika nomor telepon kosong
-                'created_at' => $user->created_at->format('d/m/Y H:i') // Format tanggal menggunakan Carbon
-            ];
+              'id' => $user->id,
+              'full_name' => htmlspecialchars($user->full_name),
+              'username' => htmlspecialchars($user->username),
+              'email' => htmlspecialchars($user->email),
+              'phone' => $user->phone ? htmlspecialchars($user->phone) : '-', // Tampilkan '-' jika nomor telepon kosong
+              'created_at' => $user->created_at->format('d/m/Y H:i') // Format tanggal menggunakan Carbon
+          ];
         });
 
         // Kembalikan respons dalam format JSON
+        //return view('index', compact('users', 'search'));
         return response()->json([
-            'success' => true,
-            'data' => $formattedUsers,
-            'pagination' => [
-                'current_page' => $users->currentPage(),
-                'total_pages' => $users->lastPage(),
-                'total_users' => $users->total(),
-                'showing_from' => $users->firstItem(),
-                'showing_to' => $users->lastItem(),
-                'per_page' => $users->perPage()
-            ],
-            'search' => $search
+          'success' => true,
+          'data' => $formattedUsers,
+          'pagination' => [
+              'current_page' => $users->currentPage(),
+              'total_pages' => $users->lastPage(),
+              'total_users' => $users->total(),
+              'showing_from' => $users->firstItem(),
+              'showing_to' => $users->lastItem(),
+              'per_page' => $users->perPage()
+          ],
+          'search' => $search
         ]);
     }
 
@@ -113,6 +114,10 @@ class UserController extends Controller
                 'message' => 'Terjadi kesalahan saat menambah user. Silakan coba lagi.'
             ], 500); // HTTP 500 Internal Server Error
         }
+    }
+    public function index() // Ini akan menjadi method untuk admin.users.index_page
+    {
+        return view('admin.users.index'); // Cukup return view tanpa data awal, karena data akan diambil via AJAX
     }
 
     /**

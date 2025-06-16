@@ -24,7 +24,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 // Middleware 'auth:sanctum' bisa ditambahkan jika Anda menggunakan autentikasi API khusus
 Route::prefix('admin')->group(function () {
     // User Management API
-    Route::get('users', [UserController::class, 'index'])->name('api.admin.users.index');
+    //Route::get('users', [UserController::class, 'index'])->name('api.admin.users.index');
     Route::post('users', [UserController::class, 'store'])->name('api.admin.users.store');
     Route::post('users/delete', [UserController::class, 'destroy'])->name('api.admin.users.destroy');
     Route::post('check-availability', [UserController::class, 'checkAvailability'])->name('api.admin.check_availability');
