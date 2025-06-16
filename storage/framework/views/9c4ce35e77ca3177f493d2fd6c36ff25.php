@@ -161,4 +161,4 @@
         </div>
     </div>
 </div>
-<?php /**PATH /Users/jerenovvidimy/Documents/Shibal/RudalJawa/vendor/laravel/framework/src/Illuminate/Foundation/Providers/../resources/exceptions/renderer/components/trace.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\laragon\www\RudalJawa\vendor\laravel\framework\src\Illuminate\Foundation\Providers/../resources/exceptions/renderer/components/trace.blade.php ENDPATH**/ ?>

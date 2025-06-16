@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk - MiraTara</title>
     <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Custom CSS (jika ada) -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet"> {{-- Sesuaikan jika Anda punya CSS umum --}}
-    <link href="{{ asset('css/auth.css') }}" rel="stylesheet"> {{-- Opsional: CSS khusus auth --}}
+    <link href="<?php echo e(asset('css/app.css')); ?>" rel="stylesheet"> 
+    <link href="<?php echo e(asset('css/auth.css')); ?>" rel="stylesheet"> 
 
     <style>
         body {
@@ -114,64 +114,96 @@
 <body>
     <div class="login-container">
         <div class="login-header">
-            <img src="{{ asset('images/logo1.png') }}" alt="MiraTara Logo"> {{-- Sesuaikan path logo --}}
-            {{-- Hapus atau ubah baris di bawah ini --}}
-            {{-- <h2>Masuk ke Admin Panel</h2> --}}
-            <h2>Masuk ke Akun Anda</h2> {{-- Mengubah teks agar lebih umum --}}
+            <img src="<?php echo e(asset('images/logo1.png')); ?>" alt="MiraTara Logo"> 
+            
+            
+            <h2>Masuk ke Akun Anda</h2> 
         </div>
 
-        {{-- Session Status / Flash Message (untuk pesan sukses, dll.) --}}
-        @if (session('status'))
+        
+        <?php if(session('status')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('status') }}
+                <?php echo e(session('status')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
 
-        {{-- Session Error Message (untuk pesan seperti dari middleware IsAdmin) --}}
-        @if (session('error'))
+        
+        <?php if(session('error')): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
+                <?php echo e(session('error')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
+        <form method="POST" action="<?php echo e(route('login')); ?>">
+            <?php echo csrf_field(); ?>
 
-            {{-- Username or Email --}}
+            
             <div class="mb-3">
                 <label for="username" class="form-label">Username atau Email</label>
-                <input id="username" class="form-control @error('username') is-invalid @enderror" type="text" name="username" value="{{ old('username') }}" required autofocus autocomplete="username" />
-                @error('username')
+                <input id="username" class="form-control <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" type="text" name="username" value="<?php echo e(old('username')); ?>" required autofocus autocomplete="username" />
+                <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                     <div class="invalid-feedback">
-                        {{ $message }}
+                        <?php echo e($message); ?>
+
                     </div>
-                @enderror
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
             </div>
 
-            {{-- Password --}}
+            
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input id="password" class="form-control @error('password') is-invalid @enderror" type="password" name="password" required autocomplete="current-password" />
-                @error('password')
+                <input id="password" class="form-control <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" type="password" name="password" required autocomplete="current-password" />
+                <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                     <div class="invalid-feedback">
-                        {{ $message }}
+                        <?php echo e($message); ?>
+
                     </div>
-                @enderror
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
             </div>
 
-            {{-- Remember Me & Forgot Password --}}
+            
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="form-check">
                     <input id="remember_me" class="form-check-input" type="checkbox" name="remember">
                     <label class="form-check-label" for="remember_me">Ingat Saya</label>
                 </div>
-                @if (Route::has('password.request'))
-                    <a class="btn-link" href="{{ route('password.request') }}">
+                <?php if(Route::has('password.request')): ?>
+                    <a class="btn-link" href="<?php echo e(route('password.request')); ?>">
                         Lupa Password?
                     </a>
-                @endif
+                <?php endif; ?>
             </div>
 
             <div class="d-grid gap-2">
@@ -180,9 +212,9 @@
 
             <div class="text-center mt-3">
                 Belum punya akun? 
-                @if (Route::has('register_page')) {{-- Menggunakan route kustom Anda --}}
-                    <a class="btn-link" href="{{ route('register_page') }}">Daftar Sekarang</a>
-                @endif
+                <?php if(Route::has('register_page')): ?> 
+                    <a class="btn-link" href="<?php echo e(route('register_page')); ?>">Daftar Sekarang</a>
+                <?php endif; ?>
             </div>
         </form>
     </div>
@@ -191,3 +223,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<?php /**PATH C:\laragon\www\RudalJawa\resources\views/auth/login.blade.php ENDPATH**/ ?>

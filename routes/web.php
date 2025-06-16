@@ -1,12 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Product; // Pastikan ini di-import untuk Route Model Binding
-
-// PASTIKAN BARIS INI TIDAK ABU-ABU/BERWARNA HIJAU KOMENTAR
-// Hapus tanda komentar (//) jika ada, atau pastikan tidak ada kesalahan sintaks di dekatnya
+use App\Models\Product;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\ProfileController;
 
 // Rute untuk homepage Miratara
 Route::get('/', function () {
@@ -27,25 +25,36 @@ Route::get('/checkout', function() {
 })->name('checkout_page');
 
 // Rute untuk admin panel
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+// Tambahkan 'is_admin' middleware di sini
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'is_admin'])->group(function () {
+    // Middleware 'verified' umumnya ditambahkan jika Anda punya fitur verifikasi email
+    
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
-    })->name('dashboard'); // Ubah dari admin.dashboard menjadi dashboard karena prefix nama sudah ada
+    })->name('dashboard');
 
-    // Manajemen User
-    Route::get('/users', [UserController::class, 'index'])->name('users.index_page'); // Gunakan Controller
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create_page'); // Gunakan Controller
+    // Manajemen User menggunakan Route::resource
+    Route::resource('users', UserController::class)->except(['show']);
 
-    // ---- Tambahkan Route API untuk data user di sini ----
-    Route::get('/users-data', [UserController::class, 'getUsersJson'])->name('users.api_data');
+    // Route khusus untuk API data tabel user (getUsersJson)
+    Route::get('/users-data', [UserController::class, 'getUsersJson'])->name('users.data');
+
+    // Route khusus untuk cek ketersediaan username/email/phone (checkAvailability)
+    Route::post('/check-availability', [UserController::class, 'checkAvailability'])->name('check-availability');
 
     // --- Manajemen Produk ---
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index_page'); // Gunakan Controller
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create_page'); // Gunakan Controller
-
-    // Untuk edit produk, menggunakan Route Model Binding
-    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit_page'); // Gunakan Controller
+    Route::resource('products', ProductController::class)->except(['show']);
 });
 
-// --- PENTING: IMPOR RUTE AUTENTIKASI BAWAAN LARAVEL BREEZE ---
+
+// Rute autentikasi bawaan Laravel Breeze/Jetstream (biasanya ada di auth.php)
 require __DIR__.'/auth.php';
+
+// Jika Anda juga mengelola profil di admin, dan menggunakan ProfileController dari Breeze
+/*
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+*/
