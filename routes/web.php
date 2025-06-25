@@ -6,11 +6,10 @@ use App\Models\Product; // Pastikan ini di-import untuk Route Model Binding
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ProfileController; // Jika Anda memang menggunakan ini
+use App\Http\Controllers\ProductController as PublicProductController; // Beri alias agar tidak konflik
 
 // Rute untuk homepage Miratara
-Route::get('/', function () {
-    return view('home.index');
-})->name('homepage');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('homepage');
 
 // Rute untuk halaman-halaman autentikasi KUSTOM Miratara Anda
 Route::get('/masuk', function() {
@@ -38,6 +37,10 @@ Route::get('/debug-user', function() {
     }
     return 'Not logged in';
 })->middleware('auth');
+
+// --- Rute Publik untuk Produk ---
+// Pastikan memanggil PublicProductController yang baru Anda buat (tanpa Admin namespace)
+Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
 
 // Rute untuk admin panel
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin'])->group(function () {
@@ -115,3 +118,112 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 */
+
+// Route debug sederhana - tambahkan di routes/web.php
+Route::get('/test-products', function() {
+    try {
+        $products = \App\Models\Product::all();
+        
+        $html = '<h1>🔍 Product Debug</h1>';
+        $html .= '<p><strong>Total Products:</strong> ' . $products->count() . '</p><hr>';
+        
+        if ($products->isEmpty()) {
+            $html .= '<p style="color: red;">❌ Tidak ada produk!</p>';
+            return $html;
+        }
+        
+        foreach ($products as $product) {
+            $imagePath = $product->image ? public_path('images/' . $product->image) : null;
+            $imageExists = $imagePath ? file_exists($imagePath) : false;
+            
+            $html .= '<div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">';
+            $html .= '<h3>' . $product->name . '</h3>';
+            $html .= '<p><strong>ID:</strong> ' . $product->id . '</p>';
+            $html .= '<p><strong>Image:</strong> ' . ($product->image ?: 'No image') . '</p>';
+            $html .= '<p><strong>File Exists:</strong> ' . ($imageExists ? '✅ Yes' : '❌ No') . '</p>';
+            $html .= '<p><strong>Full Path:</strong> ' . ($imagePath ?: 'N/A') . '</p>';
+            $html .= '<p><strong>Stock:</strong> ' . $product->stock . '</p>';
+            $html .= '<p><strong>Active:</strong> ' . ($product->is_active ? '✅ Yes' : '❌ No') . '</p>';
+            
+            if ($product->image && $imageExists) {
+                $html .= '<p><strong>Preview:</strong><br>';
+                $html .= '<img src="' . asset('images/' . $product->image) . '" style="max-width: 200px; height: auto;" /></p>';
+            }
+            
+            $html .= '</div>';
+        }
+        
+        return $html;
+        
+    } catch (\Exception $e) {
+        return '<h1>❌ Error</h1><p>' . $e->getMessage() . '</p>';
+    }
+});
+
+// Newsletter
+Route::post('/newsletter/subscribe', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
+// Footer pages - Simple placeholders (create proper controllers later)
+Route::get('/contact', function() {
+    return view('pages.contact');
+})->name('contact');
+
+Route::get('/coming-soon', function() {
+    return view('pages.coming-soon');
+})->name('coming.soon');
+
+Route::get('/order-status', function() {
+    return view('pages.order-status');
+})->name('order.status');
+
+Route::get('/returns', function() {
+    return view('pages.returns');
+})->name('returns');
+
+Route::get('/faqs', function() {
+    return view('pages.faqs');
+})->name('faqs');
+
+Route::get('/services', function() {
+    return view('pages.services');
+})->name('services');
+
+Route::get('/account', function() {
+    return view('pages.account');
+})->name('account');
+
+Route::get('/stores', function() {
+    return view('pages.stores');
+})->name('stores');
+
+Route::get('/product-care', function() {
+    return view('pages.product-care');
+})->name('product.care');
+
+Route::get('/gift-cards', function() {
+    return view('pages.gift-cards');
+})->name('gift.cards');
+
+Route::get('/about', function() {
+    return view('pages.about');
+})->name('about');
+
+Route::get('/press', function() {
+    return view('pages.press');
+})->name('press');
+
+Route::get('/careers', function() {
+    return view('pages.careers');
+})->name('careers');
+
+Route::get('/sustainability', function() {
+    return view('pages.sustainability');
+})->name('sustainability');
+
+Route::get('/legal', function() {
+    return view('pages.legal');
+})->name('legal');
+
+Route::get('/cookies', function() {
+    return view('pages.cookies');
+})->name('cookies');

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'MiraTara Fashion')</title>
-    <link rel="stylesheet" href="{{ asset('css/bootstrap/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('themify-icons/themify-icons.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/nav_carousel_style.css') }}" />
-    @stack('styles')
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo $__env->yieldContent('title', 'MiraTara Fashion'); ?></title>
+    <link rel="stylesheet" href="<?php echo e(asset('css/bootstrap/bootstrap.min.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('themify-icons/themify-icons.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('css/nav_carousel_style.css')); ?>" />
+    <?php echo $__env->yieldPushContent('styles'); ?>
     
     <style>
         /* Main content offset for fixed navbar */
@@ -48,19 +48,19 @@
     </style>
 </head>
 <body>
-    <script src="{{ asset('js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="<?php echo e(asset('js/bootstrap/bootstrap.bundle.min.js')); ?>"></script>
     
     <section id="header">
         <nav class="navbar navbar-expand-lg fixed-top bg-white">
             <div class="container-fluid">
-                <a class="navbar-brand me-auto" href="{{ route('homepage') }}">
-                    <img src="{{ asset('images/logo1.png') }}" alt="Logo" height="40" />
+                <a class="navbar-brand me-auto" href="<?php echo e(route('homepage')); ?>">
+                    <img src="<?php echo e(asset('images/logo1.png')); ?>" alt="Logo" height="40" />
                 </a>
                 <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
                     <ul class="navbar-nav justify-content-center mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link mx-lg-2 @if(Request::routeIs('homepage')) active @endif" 
-                               aria-current="page" href="{{ route('homepage') }}">Home</a>
+                            <a class="nav-link mx-lg-2 <?php if(Request::routeIs('homepage')): ?> active <?php endif; ?>" 
+                               aria-current="page" href="<?php echo e(route('homepage')); ?>">Home</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle mx-lg-2" href="#" role="button" 
@@ -88,15 +88,15 @@
                     </ul>
                 </div>
                 
-                @auth
-                <form method="POST" action="{{ route('logout') }}" class="d-flex">
-                    @csrf
+                <?php if(auth()->guard()->check()): ?>
+                <form method="POST" action="<?php echo e(route('logout')); ?>" class="d-flex">
+                    <?php echo csrf_field(); ?>
                     <button type="submit" class="nav-login-button border-0">Logout</button>
                 </form>
-                @else
-                <a href="{{ route('login_page') }}" class="nav-login-button me-2">Login</a>
-                <a href="{{ route('register_page') }}" class="nav-login-button">Register</a>
-                @endauth
+                <?php else: ?>
+                <a href="<?php echo e(route('login_page')); ?>" class="nav-login-button me-2">Login</a>
+                <a href="<?php echo e(route('register_page')); ?>" class="nav-login-button">Register</a>
+                <?php endif; ?>
                 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
                         data-bs-target="#navbarSupportedContent">
@@ -107,12 +107,12 @@
     </section>
 
     <main class="main-content">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 
     <!-- Footer -->
-    @include('components.footer')
+    <?php echo $__env->make('components.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
-</html>
+</html><?php /**PATH /Users/jerenovvidimy/Documents/Shibal/MiraTara/resources/views/layouts/main.blade.php ENDPATH**/ ?>

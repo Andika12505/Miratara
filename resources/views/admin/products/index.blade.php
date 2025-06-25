@@ -49,7 +49,7 @@
                         <tr>
                             <td>
                                 @if($product->image)
-                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" width="50">
+                                    <img src="{{ $product->image ? asset('images/' . $product->image) : asset('images/placeholder.jpg') }}" width="80">
                                 @else
                                     <i class="fas fa-box-open text-muted" style="font-size: 2em;"></i>
                                 @endif
