@@ -340,4 +340,4 @@
         border-radius: 0;
     }
 }
-</style><?php /**PATH /Users/jerenovvidimy/Documents/Shibal/MiraTara/resources/views/components/footer.blade.php ENDPATH**/ ?>
+</style><?php /**PATH C:\laragon\www\Miratara\resources\views/components/footer.blade.php ENDPATH**/ ?>

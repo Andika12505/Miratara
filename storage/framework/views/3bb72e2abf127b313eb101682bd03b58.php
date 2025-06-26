@@ -114,4 +114,4 @@
     <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html>
-<?php /**PATH /Users/jerenovvidimy/Documents/Shibal/MiraTara/resources/views/admin/layouts/app.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\laragon\www\Miratara\resources\views/admin/layouts/app.blade.php ENDPATH**/ ?>

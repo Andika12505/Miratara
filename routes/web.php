@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ProfileController; // Jika Anda memang menggunakan ini
 use App\Http\Controllers\ProductController as PublicProductController; // Beri alias agar tidak konflik
+use App\Http\Controllers\CustomerServiceController;
 
 // Rute untuk homepage Miratara
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('homepage');
@@ -158,6 +159,13 @@ Route::get('/test-products', function() {
     } catch (\Exception $e) {
         return '<h1>❌ Error</h1><p>' . $e->getMessage() . '</p>';
     }
+});
+
+Route::prefix('cs')->name('cs.')->group(function () {
+    Route::get('/', [CustomerServiceController::class, 'index'])->name('index'); // Halaman utama chatbot
+    Route::post('/get-articles', [CustomerServiceController::class, 'getArticles'])->name('get_articles'); // Mengambil artikel/opsi via AJAX
+    Route::post('/start-live-chat', [CustomerServiceController::class, 'startLiveChat'])->name('start_live_chat')->middleware('auth'); // Memulai sesi live chat
+    Route::post('/submit-ticket', [CustomerServiceController::class, 'submitTicket'])->name('submit_ticket')->middleware('auth'); // Mengajukan tiket
 });
 
 // Newsletter
