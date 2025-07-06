@@ -2,28 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Product; // Import model Product
+use App\Models\Product;
+use App\Models\Category;
+use App\Services\ProductSearch;
 use Illuminate\Http\Request;
-use Illuminate\View\View; // Untuk mengembalikan view
+use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    /**
-     * Menampilkan daftar semua produk di halaman publik.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\View\View
-     */
-    public function index(Request $request): View
+    public function index(Request $request, ProductSearch $searchService): View
     {
-        // Ambil parameter sorting dari request, default 'newest'
+        // --- DEBUG POINT 1: Cek semua input request yang diterima controller ---
+        // Ini akan menunjukkan persis apa yang dikirim dari browser Anda.
+        // dd($request->all());
+
         $sortBy = $request->query('sort_by', 'newest');
-        $limit = $request->query('limit', 12); // Jumlah produk per halaman, default 12
+        $limit = $request->query('limit', 12);
 
-        $productsQuery = Product::query();
+        $filters = $request->only([
+            'category_id', 'price_min', 'price_max',
+            'style', 'material', 'color_tone', 'fit', 'pattern', 'occasion',
+            'neckline', 'sleeve_length',
+            'general_tags', 'origin',
+        ]);
 
-        // Logika Sorting
+        foreach ([
+            'style', 'material', 'color_tone', 'fit', 'pattern', 'occasion',
+            'neckline', 'sleeve_length', 'general_tags'
+        ] as $key) {
+            if ($request->has($key) && is_string($filters[$key])) {
+                $filters[$key] = explode(',', $filters[$key]);
+            }
+        }
+
+        // --- DEBUG POINT 2: Cek array $filters setelah diproses di controller ---
+        // Ini akan menunjukkan array filter yang akan diteruskan ke ProductSearch service.
+        // dd($filters);
+
+
+        if ($request->has('vibe_name')) {
+            $searchService->applyVibe($request->input('vibe_name'));
+        } else {
+            $searchService->applyFilters($filters);
+        }
+
+        $productsQuery = $searchService->getQueryBuilder();
+
         switch ($sortBy) {
             case 'price_asc':
                 $productsQuery->orderBy('price', 'asc');
@@ -43,14 +67,49 @@ class ProductController extends Controller
                 break;
         }
 
-        // Ambil produk dengan paginasi
+        // --- DEBUG POINT 3: Cek Query SQL final sebelum dieksekusi ---
+        // Ini adalah debug point paling penting untuk masalah database.
+        dd($productsQuery->toSql(), $productsQuery->getBindings());
+
         $products = $productsQuery->paginate($limit);
 
-        // Kirim data produk dan parameter sorting ke view
+        $categories = Category::orderBy('name')->get();
+        $allVibeDefinitions = config('vibe.definitions');
+
+        $availableVibeAttributes = [];
+        foreach ($allVibeDefinitions as $vibeKey => $vibeCriteria) {
+            foreach (['occasion', 'style', 'material', 'color_tone', 'fit', 'pattern', 'neckline', 'sleeve_length'] as $attr) {
+                if (isset($vibeCriteria[$attr])) {
+                    foreach ($vibeCriteria[$attr] as $value) {
+                        if (!isset($availableVibeAttributes[$attr]) || !in_array($value, $availableVibeAttributes[$attr])) {
+                            $availableVibeAttributes[$attr][] = $value;
+                        }
+                    }
+                }
+            }
+            if (isset($vibeCriteria['general_tags'])) {
+                foreach ($vibeCriteria['general_tags'] as $value) {
+                    if (!isset($availableVibeAttributes['general_tags']) || !in_array($value, $availableVibeAttributes['general_tags'])) {
+                        $availableVibeAttributes['general_tags'][] = $value;
+                    }
+                }
+            }
+        }
+        foreach ($availableVibeAttributes as $key => $values) {
+            sort($availableVibeAttributes[$key]);
+        }
+
+        $availableOrigins = ['Indonesia', 'China', 'Vietnam', 'India', 'USA'];
+
         return view('products.index', [
             'products' => $products,
             'sortBy' => $sortBy,
             'limit' => $limit,
+            'categories' => $categories,
+            'availableVibeAttributes' => $availableVibeAttributes,
+            'availableGeneralTags' => $availableGeneralTags ?? [],
+            'availableOrigins' => $availableOrigins,
+            'request' => $request
         ]);
     }
 }

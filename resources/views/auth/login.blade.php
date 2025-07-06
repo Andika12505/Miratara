@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Custom CSS (jika ada) -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet"> {{-- Sesuaikan jika Anda punya CSS umum --}}
-    <link href="{{ asset('css/auth.css') }}" rel="stylesheet"> {{-- Opsional: CSS khusus auth --}}
 
     <style>
         body {
@@ -41,10 +40,14 @@
             max-height: 70px; /* Sedikit dikurangi ukuran logo */
             margin-bottom: 10px;
         }
+        img{
+            max-width: 100%;
+            display: block;
+        }
         .login-header h2 { /* Ini adalah target yang akan dihapus atau diubah */
             font-weight: 700;
             color: #333;
-            font-size: 1.8rem; /* Sedikit dikurangi ukuran font */
+            font-size: 1.2rem; /* Sedikit dikurangi ukuran font */
         }
         .form-label {
             font-size: 0.95rem; /* Ukuran font label */
@@ -106,7 +109,7 @@
                 margin: 10px auto;
             }
             .login-header h2 {
-                font-size: 1.6rem;
+                font-size: 1rem;
             }
         }
     </style>
@@ -115,8 +118,6 @@
     <div class="login-container">
         <div class="login-header">
             <img src="{{ asset('images/logo1.png') }}" alt="MiraTara Logo"> {{-- Sesuaikan path logo --}}
-            {{-- Hapus atau ubah baris di bawah ini --}}
-            {{-- <h2>Masuk ke Admin Panel</h2> --}}
             <h2>Masuk ke Akun Anda</h2> {{-- Mengubah teks agar lebih umum --}}
         </div>
 

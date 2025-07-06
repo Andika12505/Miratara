@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('themify-icons/themify-icons.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/nav_carousel_style.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     @stack('styles')
     
     <style>

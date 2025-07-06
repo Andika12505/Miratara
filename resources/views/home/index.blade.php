@@ -25,7 +25,7 @@
                     <div class="home-banner-text">
                         <h1>Miaw</h1>
                         <h2>100% Discount For This All Day</h2>
-                        <a href="{{ route('products.index') }}" class="btn-carousel text-uppercase mt-4">Our Product</a>
+                        <a href="{{ route('products.index') }}" class="btn-carousel text-uppercase mt-4">Our Products</a>
                     </div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="headline text-center mb-5">
-                    <h2 class="pb-3 position-relative d-idline-block">OUR PRODUCT</h2>
+                    <h2 class="pb-3 position-relative d-idline-block">Our Products</h2>
                 </div>
             </div>
         </div>
@@ -289,7 +289,7 @@
 .home .home-banner-2 {
     background-repeat: no-repeat;
     background-size: cover;
-    background-position: 100% center;
+    background-position: 50% center;
     min-height: 650px;
     position: relative;
 }
@@ -334,6 +334,10 @@
 
 .btn-carousel:hover {
     background-color: #ff8fab;
+}
+
+img{
+    max-width: 100%;
 }
 
 .products {

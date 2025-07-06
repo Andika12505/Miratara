@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="<?php echo e(asset('css/bootstrap/bootstrap.min.css')); ?>" />
     <link rel="stylesheet" href="<?php echo e(asset('themify-icons/themify-icons.css')); ?>" />
     <link rel="stylesheet" href="<?php echo e(asset('css/nav_carousel_style.css')); ?>" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <?php echo $__env->yieldPushContent('styles'); ?>
     
     <style>
@@ -115,4 +116,4 @@
 
     <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
-</html><?php /**PATH C:\laragon\www\Miratara\resources\views/layouts/main.blade.php ENDPATH**/ ?>
+</html><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/layouts/main.blade.php ENDPATH**/ ?>

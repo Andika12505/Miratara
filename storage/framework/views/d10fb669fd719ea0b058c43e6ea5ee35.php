@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Custom CSS (jika ada) -->
     <link href="<?php echo e(asset('css/app.css')); ?>" rel="stylesheet"> 
-    <link href="<?php echo e(asset('css/auth.css')); ?>" rel="stylesheet"> 
 
     <style>
         body {
@@ -41,10 +40,14 @@
             max-height: 70px; /* Sedikit dikurangi ukuran logo */
             margin-bottom: 10px;
         }
+        img{
+            max-width: 100%;
+            display: block;
+        }
         .login-header h2 { /* Ini adalah target yang akan dihapus atau diubah */
             font-weight: 700;
             color: #333;
-            font-size: 1.8rem; /* Sedikit dikurangi ukuran font */
+            font-size: 1.2rem; /* Sedikit dikurangi ukuran font */
         }
         .form-label {
             font-size: 0.95rem; /* Ukuran font label */
@@ -106,7 +109,7 @@
                 margin: 10px auto;
             }
             .login-header h2 {
-                font-size: 1.6rem;
+                font-size: 1rem;
             }
         }
     </style>
@@ -115,8 +118,6 @@
     <div class="login-container">
         <div class="login-header">
             <img src="<?php echo e(asset('images/logo1.png')); ?>" alt="MiraTara Logo"> 
-            
-            
             <h2>Masuk ke Akun Anda</h2> 
         </div>
 
@@ -223,4 +224,4 @@ unset($__errorArgs, $__bag); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-<?php /**PATH C:\laragon\www\Miratara\resources\views/auth/login.blade.php ENDPATH**/ ?>
+<?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/auth/login.blade.php ENDPATH**/ ?>

@@ -1,92 +1,90 @@
-{{-- MTGemini/resources/views/products/index.blade.php --}}
+<?php $__env->startSection('title', 'Products - MiraTara Fashion'); ?>
 
-@extends('layouts.main')
-
-@section('title', 'Products - MiraTara Fashion')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid px-4 py-4">
     <div class="row">
-        {{-- Bagian Konten Produk Utama --}}
-        <div class="col-12"> {{-- Awalnya ini col-lg-9 col-md-8, kita buat 100% lebar untuk layout pop-out --}}
+        
+        <div class="col-12"> 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="section-title">Our Products</h2>
                 <div class="sorting-and-filter-options d-flex align-items-center">
-                    {{-- Tombol untuk memicu Sidebar Filter --}}
+                    
                     <button class="btn btn-outline-secondary me-3" id="openFilterSidebarBtn">
                         <i class="fas fa-filter me-2"></i> Filter
                     </button>
 
                     <label for="sortSelect" class="form-label mb-0 me-2 d-none d-sm-inline-block">Sort by:</label>
                     <select id="sortSelect" class="form-select" onchange="handleSortChange()">
-                        <option value="newest" {{ $sortBy == 'newest' ? 'selected' : '' }}>Newest</option>
-                        <option value="price_asc" {{ $sortBy == 'price_asc' ? 'selected' : '' }}>Price: Lowest to Highest</option>
-                        <option value="price_desc" {{ $sortBy == 'price_desc' ? 'selected' : '' }}>Price: Highest to Lowest</option>
-                        <option value="name_asc" {{ $sortBy == 'name_asc' ? 'selected' : '' }}>Name: A-Z</option>
-                        <option value="name_desc" {{ $sortBy == 'name_desc' ? 'selected' : '' }}>Name: Z-A</option>
+                        <option value="newest" <?php echo e($sortBy == 'newest' ? 'selected' : ''); ?>>Newest</option>
+                        <option value="price_asc" <?php echo e($sortBy == 'price_asc' ? 'selected' : ''); ?>>Price: Lowest to Highest</option>
+                        <option value="price_desc" <?php echo e($sortBy == 'price_desc' ? 'selected' : ''); ?>>Price: Highest to Lowest</option>
+                        <option value="name_asc" <?php echo e($sortBy == 'name_asc' ? 'selected' : ''); ?>>Name: A-Z</option>
+                        <option value="name_desc" <?php echo e($sortBy == 'name_desc' ? 'selected' : ''); ?>>Name: Z-A</option>
                     </select>
                 </div>
             </div>
 
             <div class="row g-4">
-                @forelse($products as $product)
+                <?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="product-card">
                         <div class="product-image-container position-relative">
-                            @if(isset($product->metadata['is_discounted']) && $product->metadata['is_discounted'])
+                            <?php if(isset($product->metadata['is_discounted']) && $product->metadata['is_discounted']): ?>
                             <div class="discount-badge">
                                 <span>DISKON</span>
                             </div>
-                            @endif
+                            <?php endif; ?>
 
-                            <img src="{{ $product->image ? asset('images/' . $product->image) : asset('images/placeholder.jpg') }}" 
-                                 alt="{{ $product->name }}" 
+                            <img src="<?php echo e($product->image ? asset('images/' . $product->image) : asset('images/placeholder.jpg')); ?>" 
+                                 alt="<?php echo e($product->name); ?>" 
                                  class="product-image">
                         </div>
 
                         <div class="product-info">
-                            <h3 class="product-title">{{ $product->name }}</h3>
+                            <h3 class="product-title"><?php echo e($product->name); ?></h3>
 
                             <div class="product-pricing">
-                                @if(isset($product->metadata['original_price']) && $product->metadata['original_price'])
-                                <span class="current-price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                                <span class="original-price">Rp {{ number_format($product->metadata['original_price'], 0, ',', '.') }}</span>
-                                @else
-                                <span class="current-price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                                @endif
+                                <?php if(isset($product->metadata['original_price']) && $product->metadata['original_price']): ?>
+                                <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
+                                <span class="original-price">Rp <?php echo e(number_format($product->metadata['original_price'], 0, ',', '.')); ?></span>
+                                <?php else: ?>
+                                <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
+                                <?php endif; ?>
                             </div>
 
                             <button class="add-to-bag-btn" 
-                                    data-product-id="{{ $product->id }}"
-                                    {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                {{ $product->stock <= 0 ? 'HABIS' : 'TAMBAH KE KERANJANG' }}
+                                    data-product-id="<?php echo e($product->id); ?>"
+                                    <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
+                                <?php echo e($product->stock <= 0 ? 'HABIS' : 'TAMBAH KE KERANJANG'); ?>
+
                             </button>
                         </div>
                     </div>
                 </div>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="col-12">
                     <div class="text-center py-5">
                         <p class="text-muted">Tidak ada produk yang ditemukan dengan filter ini.</p>
-                        <a href="{{ route('products.index') }}" class="btn btn-primary mt-3">Reset Semua Filter</a>
+                        <a href="<?php echo e(route('products.index')); ?>" class="btn btn-primary mt-3">Reset Semua Filter</a>
                     </div>
                 </div>
-                @endforelse
+                <?php endif; ?>
             </div>
 
-            @if($products->hasPages())
+            <?php if($products->hasPages()): ?>
             <div class="row mt-5">
                 <div class="col-12 d-flex justify-content-center">
-                    {{ $products->appends(request()->query())->links() }}
+                    <?php echo e($products->appends(request()->query())->links()); ?>
+
                 </div>
             </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
-{{-- SERTAKAN PARTIAL FILTER SIDEBAR DI SINI --}}
-@include('partials.product_filter_sidebar', [
+
+<?php echo $__env->make('partials.product_filter_sidebar', [
     'categories' => $categories,
     'availableVibeAttributes' => $availableVibeAttributes,
     'availableGeneralTags' => $availableGeneralTags,
@@ -94,9 +92,9 @@
     'request' => $request,
     'sortBy' => $sortBy,
     'limit' => $limit
-])
+], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
 /* Global Container */
 .container-fluid {
@@ -385,9 +383,9 @@
     }
 }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const filterSidebar = document.getElementById('filterSidebar');
@@ -502,5 +500,6 @@ if (typeof updateCartCount === 'undefined') {
     }
 }
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/products/index.blade.php ENDPATH**/ ?>

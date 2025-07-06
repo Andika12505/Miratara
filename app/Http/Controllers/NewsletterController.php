@@ -21,13 +21,7 @@ class NewsletterController extends Controller
         }
 
         $email = $request->email;
-
-        // Here you can:
-        // 1. Save to database (create newsletters table)
-        // 2. Send to email service (Mailchimp, SendGrid, etc.)
-        // 3. Add to mailing list
         
-        // For now, just simulate success
         try {
             // Example: Save to database
             // Newsletter::firstOrCreate(['email' => $email]);
