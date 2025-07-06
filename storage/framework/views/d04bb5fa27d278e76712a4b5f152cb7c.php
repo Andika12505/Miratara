@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@yield('title', 'MiraTara Fashion')</title>
+    <title><?php echo $__env->yieldContent('title', 'MiraTara Fashion'); ?></title>
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
-    <link rel="stylesheet" href="{{ asset('css/bootstrap/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('themify-icons/themify-icons.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/nav_carousel_style.css') }}" />
+    <link rel="stylesheet" href="<?php echo e(asset('css/bootstrap/bootstrap.min.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('themify-icons/themify-icons.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('css/nav_carousel_style.css')); ?>" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
     <style>
         /* Custom styles for account icon and spacing in navbar */
         /* Anda bisa memindahkan style ini ke file CSS eksternal jika diinginkan */
@@ -64,13 +64,13 @@
 </head>
 
 <body>
-    <script src="{{ asset('js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="<?php echo e(asset('js/bootstrap/bootstrap.bundle.min.js')); ?>"></script>
 
     <section id="header">
         <nav class="navbar navbar-expand-lg fixed-top bg-white">
             <div class="container-fluid">
-                <a class="navbar-brand me-auto" href="{{ route('homepage') }}">
-                    <img src="{{ asset('images/logo1.png') }}" alt="Logo" height="40" />
+                <a class="navbar-brand me-auto" href="<?php echo e(route('homepage')); ?>">
+                    <img src="<?php echo e(asset('images/logo1.png')); ?>" alt="Logo" height="40" />
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
                 <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
                     <ul class="navbar-nav justify-content-center mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link mx-lg-2 @if(Request::routeIs('homepage')) active @endif" aria-current="page" href="{{ route('homepage') }}">Home</a>
+                            <a class="nav-link mx-lg-2 <?php if(Request::routeIs('homepage')): ?> active <?php endif; ?>" aria-current="page" href="<?php echo e(route('homepage')); ?>">Home</a>
                         </li>
 
                         <li class="nav-item dropdown">
@@ -107,41 +107,42 @@
                         </li>
                     </ul>
 
-                    {{-- Bagian Login/Logout/Akun - Disisipkan di dalam collapse agar responsif --}}
-                    <div class="d-flex align-items-center ms-auto"> {{-- ms-auto untuk dorong ke kanan --}}
-                        @auth {{-- Tampilkan ini jika user sudah login --}}
+                    
+                    <div class="d-flex align-items-center ms-auto"> 
+                        <?php if(auth()->guard()->check()): ?> 
                         <div class="nav-item dropdown">
     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        @if (Auth::user()->profile_photo_path)
-            <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="Foto" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
-        @else
+        <?php if(Auth::user()->profile_photo_path): ?>
+            <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo_path)); ?>" alt="Foto" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
+        <?php else: ?>
             <i class="fas fa-user-circle fa-lg me-2"></i>
-        @endif
-        {{ Auth::user()->username }}
+        <?php endif; ?>
+        <?php echo e(Auth::user()->username); ?>
+
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
-        <li><a class="dropdown-item" href="{{ route('customer.account.view') }}">Lihat Akun</a></li>
+        <li><a class="dropdown-item" href="<?php echo e(route('customer.account.view')); ?>">Lihat Akun</a></li>
         <li><hr class="dropdown-divider"></li>
         <li>
-            <form id="logout-form-customer" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
+            <form id="logout-form-customer" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
+                <?php echo csrf_field(); ?>
             </form>
             <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form-customer').submit();">Logout</a>
         </li>
     </ul>
 </div
-                        @else {{-- Tampilkan ini jika user belum login --}}
-                        <a href="{{ route('login_page') }}" class="nav-login-button me-2">Login</a>
-                        <a href="{{ route('register_page') }}" class="nav-login-button btn-primary">Register</a>
-                        @endauth
+                        <?php else: ?> 
+                        <a href="<?php echo e(route('login_page')); ?>" class="nav-login-button me-2">Login</a>
+                        <a href="<?php echo e(route('register_page')); ?>" class="nav-login-button btn-primary">Register</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </nav>
     </section>
 
-    @yield('content')
+    <?php echo $__env->yieldContent('content'); ?>
 
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
-</html>
+</html><?php /**PATH /Users/andika/Documents/Miratara/resources/views/layouts/main.blade.php ENDPATH**/ ?>

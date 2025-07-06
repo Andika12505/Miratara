@@ -3,101 +3,103 @@
 @section('title', 'Home - MiraTara Fashion')
 
 @section('content')
-<section id="home" class="home overflow-hidden">
-    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" 
-                    class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" 
-                    aria-label="Slide 2"></button>
+    {{-- Bagian Carousel (Home Section) --}}
+    <section id="home" class="home overflow-hidden">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" 
+                        class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" 
+                        aria-label="Slide 2"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="home-banner home-banner-1" style="background-image: url('{{ asset('images/miaw1.png') }}');">
+                        <div class="home-banner-text">
+                            <a href="{{ route('products.index') }}" class="text-uppercase mt-4"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="home-banner home-banner-2" style="background-image: url('{{ asset('images/miaw2.png') }}');">
+                        <div class="home-banner-text">
+                            <h1>Miaw</h1>
+                            <h2>100% Discount For This All Day</h2>
+                            <a href="{{ route('products.index') }}" class="btn-carousel text-uppercase mt-4">Our Products</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="ti-angle-left slider-icon"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="ti-angle-right slider-icon"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="home-banner home-banner-1" style="background-image: url('{{ asset('images/miaw1.png') }}');">
-                    <div class="home-banner-text">
-                        <a href="{{ route('products.index') }}" class="text-uppercase mt-4"></a>
+    </section>
+
+    {{-- Bagian Produk (Products Section) --}}
+    <section id="products" class="products">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="headline text-center mb-5">
+                        <h2 class="pb-3 position-relative d-inline-block">Our Products</h2> {{-- Mengubah d-idline-block menjadi d-inline-block --}}
                     </div>
                 </div>
             </div>
 
-            <div class="carousel-item">
-                <div class="home-banner home-banner-2" style="background-image: url('{{ asset('images/miaw2.png') }}');">
-                    <div class="home-banner-text">
-                        <h1>Miaw</h1>
-                        <h2>100% Discount For This All Day</h2>
-                        <a href="{{ route('products.index') }}" class="btn-carousel text-uppercase mt-4">Our Products</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-            <span class="ti-angle-left slider-icon"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-            <span class="ti-angle-right slider-icon"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
-</section>
-
-<section id="products" class="products">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="headline text-center mb-5">
-                    <h2 class="pb-3 position-relative d-idline-block">Our Products</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            @forelse($featuredProducts as $product)
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <div class="product-card">
-                    <div class="product-image-container position-relative">
-                        <img src="{{ $product->image ? asset('images/' . $product->image) : 'https://via.placeholder.com/400x600/f8f9fa/6c757d?text=' . urlencode($product->name) }}" 
-                             alt="{{ $product->name }}" 
-                             class="product-image"
-                             onerror="this.src='https://via.placeholder.com/400x600/f8f9fa/6c757d?text=No+Image'">
-                    </div>
-                    
-                    <div class="product-info">
-                        <h3 class="product-title">{{ $product->name }}</h3>
-                        
-                        <div class="product-pricing">
-                            <span class="current-price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+            <div class="row g-4">
+                @forelse($featuredProducts as $product)
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="product-card">
+                        <div class="product-image-container position-relative">
+                            <img src="{{ $product->image ? asset('images/' . $product->image) : 'https://via.placeholder.com/400x600/f8f9fa/6c757d?text=' . urlencode($product->name) }}" 
+                                 alt="{{ $product->name }}" 
+                                 class="product-image"
+                                 onerror="this.src='https://via.placeholder.com/400x600/f8f9fa/6c757d?text=No+Image'">
                         </div>
                         
-                        <button class="add-to-bag-btn" 
-                                data-product-id="{{ $product->id }}"
-                                {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                            {{ $product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG' }}
-                        </button>
+                        <div class="product-info">
+                            <h3 class="product-title">{{ $product->name }}</h3>
+                            
+                            <div class="product-pricing">
+                                <span class="current-price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                            </div>
+                            
+                            <button class="add-to-bag-btn" 
+                                    data-product-id="{{ $product->id }}"
+                                    {{ $product->stock <= 0 ? 'disabled' : '' }}>
+                                {{ $product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
+                @empty
+                <!-- Fallback jika tidak ada produk -->
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <p class="text-muted">No featured products available at the moment.</p>
+                        <a href="{{ route('products.index') }}" class="btn-carousel">View All Products</a>
+                    </div>
+                </div>
+                @endforelse
             </div>
-            @empty
-            <!-- Fallback jika tidak ada produk -->
-            <div class="col-12">
-                <div class="text-center py-5">
-                    <p class="text-muted">No featured products available at the moment.</p>
+
+            <!-- Link to view all products -->
+            @if($featuredProducts->count() > 0)
+            <div class="row mt-4 mb-4">
+                <div class="col-12 text-center">
                     <a href="{{ route('products.index') }}" class="btn-carousel">View All Products</a>
                 </div>
             </div>
-            @endforelse
+            @endif
         </div>
-
-        <!-- Link to view all products -->
-        @if($featuredProducts->count() > 0)
-        <div class="row mt-4 mb-4">
-            <div class="col-12 text-center">
-                <a href="{{ route('products.index') }}" class="btn-carousel">View All Products</a>
-            </div>
-        </div>
-        @endif
-    </div>
-</section>
+    </section>
 
 @push('styles')
 <style>
@@ -374,7 +376,7 @@ img{
     }
     
     .product-title {
-        font-size: 15px;
+        font-size: 16px;
     }
     
     .home .home-banner .home-banner-text h1 {
@@ -485,4 +487,3 @@ function updateCartCount() {
 }
 </script>
 @endpush
-@endsection

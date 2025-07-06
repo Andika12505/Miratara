@@ -1,102 +1,104 @@
 <?php $__env->startSection('title', 'Home - MiraTara Fashion'); ?>
 
 <?php $__env->startSection('content'); ?>
-<section id="home" class="home overflow-hidden">
-    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" 
-                    class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" 
-                    aria-label="Slide 2"></button>
+    
+    <section id="home" class="home overflow-hidden">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" 
+                        class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" 
+                        aria-label="Slide 2"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="home-banner home-banner-1" style="background-image: url('<?php echo e(asset('images/miaw1.png')); ?>');">
+                        <div class="home-banner-text">
+                            <a href="<?php echo e(route('products.index')); ?>" class="text-uppercase mt-4"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="home-banner home-banner-2" style="background-image: url('<?php echo e(asset('images/miaw2.png')); ?>');">
+                        <div class="home-banner-text">
+                            <h1>Miaw</h1>
+                            <h2>100% Discount For This All Day</h2>
+                            <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel text-uppercase mt-4">Our Products</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="ti-angle-left slider-icon"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="ti-angle-right slider-icon"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="home-banner home-banner-1" style="background-image: url('<?php echo e(asset('images/miaw1.png')); ?>');">
-                    <div class="home-banner-text">
-                        <a href="<?php echo e(route('products.index')); ?>" class="text-uppercase mt-4"></a>
+    </section>
+
+    
+    <section id="products" class="products">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="headline text-center mb-5">
+                        <h2 class="pb-3 position-relative d-inline-block">Our Products</h2> 
                     </div>
                 </div>
             </div>
 
-            <div class="carousel-item">
-                <div class="home-banner home-banner-2" style="background-image: url('<?php echo e(asset('images/miaw2.png')); ?>');">
-                    <div class="home-banner-text">
-                        <h1>Miaw</h1>
-                        <h2>100% Discount For This All Day</h2>
-                        <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel text-uppercase mt-4">Our Products</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-            <span class="ti-angle-left slider-icon"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-            <span class="ti-angle-right slider-icon"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
-</section>
-
-<section id="products" class="products">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="headline text-center mb-5">
-                    <h2 class="pb-3 position-relative d-idline-block">Our Products</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <?php $__empty_1 = true; $__currentLoopData = $featuredProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <div class="product-card">
-                    <div class="product-image-container position-relative">
-                        <img src="<?php echo e($product->image ? asset('images/' . $product->image) : 'https://via.placeholder.com/400x600/f8f9fa/6c757d?text=' . urlencode($product->name)); ?>" 
-                             alt="<?php echo e($product->name); ?>" 
-                             class="product-image"
-                             onerror="this.src='https://via.placeholder.com/400x600/f8f9fa/6c757d?text=No+Image'">
-                    </div>
-                    
-                    <div class="product-info">
-                        <h3 class="product-title"><?php echo e($product->name); ?></h3>
-                        
-                        <div class="product-pricing">
-                            <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
+            <div class="row g-4">
+                <?php $__empty_1 = true; $__currentLoopData = $featuredProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="product-card">
+                        <div class="product-image-container position-relative">
+                            <img src="<?php echo e($product->image ? asset('images/' . $product->image) : 'https://via.placeholder.com/400x600/f8f9fa/6c757d?text=' . urlencode($product->name)); ?>" 
+                                 alt="<?php echo e($product->name); ?>" 
+                                 class="product-image"
+                                 onerror="this.src='https://via.placeholder.com/400x600/f8f9fa/6c757d?text=No+Image'">
                         </div>
                         
-                        <button class="add-to-bag-btn" 
-                                data-product-id="<?php echo e($product->id); ?>"
-                                <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
-                            <?php echo e($product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG'); ?>
+                        <div class="product-info">
+                            <h3 class="product-title"><?php echo e($product->name); ?></h3>
+                            
+                            <div class="product-pricing">
+                                <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
+                            </div>
+                            
+                            <button class="add-to-bag-btn" 
+                                    data-product-id="<?php echo e($product->id); ?>"
+                                    <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
+                                <?php echo e($product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG'); ?>
 
-                        </button>
+                            </button>
+                        </div>
                     </div>
                 </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <!-- Fallback jika tidak ada produk -->
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <p class="text-muted">No featured products available at the moment.</p>
+                        <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel">View All Products</a>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-            <!-- Fallback jika tidak ada produk -->
-            <div class="col-12">
-                <div class="text-center py-5">
-                    <p class="text-muted">No featured products available at the moment.</p>
+
+            <!-- Link to view all products -->
+            <?php if($featuredProducts->count() > 0): ?>
+            <div class="row mt-4 mb-4">
+                <div class="col-12 text-center">
                     <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel">View All Products</a>
                 </div>
             </div>
             <?php endif; ?>
         </div>
-
-        <!-- Link to view all products -->
-        <?php if($featuredProducts->count() > 0): ?>
-        <div class="row mt-4 mb-4">
-            <div class="col-12 text-center">
-                <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel">View All Products</a>
-            </div>
-        </div>
-        <?php endif; ?>
-    </div>
-</section>
+    </section>
 
 <?php $__env->startPush('styles'); ?>
 <style>
@@ -373,7 +375,7 @@ img{
     }
     
     .product-title {
-        font-size: 15px;
+        font-size: 16px;
     }
     
     .home .home-banner .home-banner-text h1 {
@@ -484,5 +486,4 @@ function updateCartCount() {
 }
 </script>
 <?php $__env->stopPush(); ?>
-<?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/home/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/andika/Documents/Miratara/resources/views/home/index.blade.php ENDPATH**/ ?>

@@ -35,37 +35,32 @@
           </a>
         </div>
 
-        <div class="navbar-nav position-absolute end-0 me-3">
-          <div class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle admin-dropdown"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-            >
-              <i class="fas fa-user-shield me-1"></i>
-              Admin
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <a class="dropdown-item" href="{{ route('homepage') }}">
-                  <i class="fas fa-home me-2"></i>Lihat Website
-                </a>
-              </li>
-              <li><hr class="dropdown-divider" /></li>
-              <li>
-                <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
-                  <i class="fas fa-sign-out-alt me-2"></i>Logout
-                </a>
-                <form id="admin-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </nav>
+{{-- Ini adalah perbaikan untuk public layout, bukan admin --}}
+@auth {{-- Tampilkan ini jika user sudah login --}}
+<div class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        @if (Auth::user()->profile_photo_path)
+            <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="Foto" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
+        @else
+            <i class="fas fa-user-circle fa-lg me-2"></i>
+        @endif
+        {{ Auth::user()->username }}
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
+        <li><a class="dropdown-item" href="{{ route('customer.account.view') }}">Lihat Akun</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <form id="logout-form-customer" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+            <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form-customer').submit();">Logout</a>
+        </li>
+    </ul>
+</div>
+@else {{-- Tampilkan ini jika user belum login --}}
+<a href="{{ route('login_page') }}" class="nav-login-button me-2">Login</a>
+<a href="{{ route('register_page') }}" class="nav-login-button btn-primary">Register</a>
+@endauth
 
     <div class="container-fluid mt-5 pt-3">
       <div class="row">

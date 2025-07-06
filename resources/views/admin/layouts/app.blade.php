@@ -34,31 +34,33 @@
             </div>
 
             <div class="navbar-nav position-absolute end-0 me-3">
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle admin-dropdown" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-shield me-1"></i>
-                        Admin
+              <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle admin-dropdown d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                  @if (Auth::user()->profile_photo_path)
+                    <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="Foto" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
+                  @else
+                    <i class="fas fa-user-shield me-2"></i>
+                  @endif
+                  {{ Auth::user()->username }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{{ route('homepage') }}">
+                      <i class="fas fa-home me-2"></i>Lihat Website
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('homepage') }}">
-                                <i class="fas fa-home me-2"></i>Lihat Website
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li>
-                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                            <form id="admin-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                @csrf
-                            </form>
-                        </li>
-                    </ul>
-                </div>
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                    <form id="admin-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                      @csrf
+                    </form>
+                  </li>
+                </ul>
+              </div>
             </div>
-        </div>
-    </nav>
 
     <div class="container-fluid mt-5 pt-3">
         <div class="row">
