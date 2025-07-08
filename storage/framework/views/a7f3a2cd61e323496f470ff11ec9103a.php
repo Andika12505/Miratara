@@ -1,8 +1,6 @@
-@extends('layouts.main')
+<?php $__env->startSection('title', 'Home - MiraTara Fashion'); ?>
 
-@section('title', 'Home - MiraTara Fashion')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <section id="home" class="home overflow-hidden">
     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
@@ -13,19 +11,19 @@
         </div>
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <div class="home-banner home-banner-1" style="background-image: url('{{ asset('images/miaw1.png') }}');">
+                <div class="home-banner home-banner-1" style="background-image: url('<?php echo e(asset('images/miaw1.png')); ?>');">
                     <div class="home-banner-text">
-                        <a href="{{ route('products.index') }}" class="text-uppercase mt-4"></a>
+                        <a href="<?php echo e(route('products.index')); ?>" class="text-uppercase mt-4"></a>
                     </div>
                 </div>
             </div>
 
             <div class="carousel-item">
-                <div class="home-banner home-banner-2" style="background-image: url('{{ asset('images/miaw2.png') }}');">
+                <div class="home-banner home-banner-2" style="background-image: url('<?php echo e(asset('images/miaw2.png')); ?>');">
                     <div class="home-banner-text">
                         <h1>Miaw</h1>
                         <h2>100% Discount For This All Day</h2>
-                        <a href="{{ route('products.index') }}" class="btn-carousel text-uppercase mt-4">Our Products</a>
+                        <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel text-uppercase mt-4">Our Products</a>
                     </div>
                 </div>
             </div>
@@ -52,60 +50,61 @@
         </div>
 
         <div class="row g-4">
-            @forelse($products as $product)
+            <?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <div class="col-lg-4 col-md-6 col-sm-12">
                 <div class="product-card">
                     <div class="product-image-container position-relative">
-                        {{-- Keep your original image path (images/) --}}
-                        <img src="{{ $product->image ? asset('images/' . $product->image) : 'https://via.placeholder.com/400x600/f8f9fa/6c757d?text=' . urlencode($product->name) }}" 
-                             alt="{{ $product->name }}" 
+                        
+                        <img src="<?php echo e($product->image ? asset('images/' . $product->image) : 'https://via.placeholder.com/400x600/f8f9fa/6c757d?text=' . urlencode($product->name)); ?>" 
+                             alt="<?php echo e($product->name); ?>" 
                              class="product-image"
                              onerror="this.src='https://via.placeholder.com/400x600/f8f9fa/6c757d?text=No+Image'">
                     </div>
                     
                     <div class="product-info">
-                        <h3 class="product-title">{{ $product->name }}</h3>
+                        <h3 class="product-title"><?php echo e($product->name); ?></h3>
                         
                         <div class="product-pricing">
-                            <span class="current-price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                            <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
                         </div>
                         
-                        {{-- Use their form-based cart system instead of your JavaScript --}}
-                        <form action="{{ route('cart.add') }}" method="POST" class="d-grid add-to-cart-form">
-                            @csrf
-                            <input type="hidden" name="id" value="{{ $product->id }}">
+                        
+                        <form action="<?php echo e(route('cart.add')); ?>" method="POST" class="d-grid add-to-cart-form">
+                            <?php echo csrf_field(); ?>
+                            <input type="hidden" name="id" value="<?php echo e($product->id); ?>">
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="add-to-bag-btn" {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                {{ $product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG' }}
+                            <button type="submit" class="add-to-bag-btn" <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
+                                <?php echo e($product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG'); ?>
+
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <!-- Fallback jika tidak ada produk -->
             <div class="col-12">
                 <div class="text-center py-5">
                     <p class="text-muted">No featured products available at the moment.</p>
-                    <a href="{{ route('products.index') }}" class="btn-carousel">View All Products</a>
+                    <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel">View All Products</a>
                 </div>
             </div>
-            @endforelse
+            <?php endif; ?>
         </div>
 
         <!-- Link to view all products -->
-        @if($products->count() > 0)
+        <?php if($products->count() > 0): ?>
         <div class="row mt-4">
             <div class="col-12 text-center">
-                <a href="{{ route('products.index') }}" class="btn-carousel">View All Products</a>
+                <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel">View All Products</a>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 </section>
 
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
 /* Homepage specific container adjustments */
 .container {
@@ -403,6 +402,7 @@ img{
     }
 }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-{{-- Push script tidak diperlukan lagi karena logika Add to Cart sudah menyatu dengan form --}}
+
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/home/index.blade.php ENDPATH**/ ?>

@@ -12,9 +12,71 @@ class ProductController extends Controller
 {
     public function index(Request $request, ProductSearch $searchService): View
     {
-        // --- DEBUG POINT 1: Cek semua input request yang diterima controller ---
-        // Ini akan menunjukkan persis apa yang dikirim dari browser Anda.
-        // dd($request->all());
+        // ===== COMPREHENSIVE DEBUG BLOCK =====
+        if ($request->has('material')) {
+            
+            // 1. Check what we received
+            $receivedMaterial = $request->input('material');
+            
+            // 2. Check how it's processed
+            $filters = $request->only([
+                'category_id', 'price_min', 'price_max',
+                'style', 'material', 'color_tone', 'fit', 'pattern', 'occasion',
+                'neckline', 'sleeve_length',
+                'general_tags', 'origin',
+            ]);
+
+            foreach ([
+                'style', 'material', 'color_tone', 'fit', 'pattern', 'occasion',
+                'neckline', 'sleeve_length', 'general_tags'
+            ] as $key) {
+                if ($request->has($key) && is_string($filters[$key])) {
+                    $filters[$key] = explode(',', $filters[$key]);
+                }
+            }
+            
+            // 3. Check actual products in database
+            $totalProducts = Product::count();
+            $sampleMetadata = Product::select('metadata')->first();
+            
+            // 4. Test different query approaches
+            $testQueries = [
+                'direct_cotton' => Product::whereJsonContains('metadata->vibe_attributes->material', 'cotton')->count(),
+                'array_cotton' => Product::whereJsonContains('metadata->vibe_attributes->material', ['cotton'])->count(),
+                'like_cotton' => Product::where('metadata', 'LIKE', '%cotton%')->count(),
+                'case_insensitive' => Product::whereRaw('LOWER(JSON_EXTRACT(metadata, "$.vibe_attributes.material")) LIKE ?', ['%cotton%'])->count(),
+            ];
+            
+            // 5. Test with ProductSearch service
+            $searchService->applyFilters($filters);
+            $queryBuilder = $searchService->getQueryBuilder();
+            $resultCount = $queryBuilder->count();
+            $sqlQuery = $queryBuilder->toSql();
+            $bindings = $queryBuilder->getBindings();
+            
+            // 6. Get actual products that should match
+            $productsWithMaterial = Product::whereNotNull('metadata->vibe_attributes->material')->get();
+            $allMaterials = [];
+            foreach ($productsWithMaterial as $product) {
+                $materials = data_get($product->metadata, 'vibe_attributes.material', []);
+                $allMaterials = array_merge($allMaterials, is_array($materials) ? $materials : [$materials]);
+            }
+            $uniqueMaterials = array_unique($allMaterials);
+            
+            /*dd([
+                'step1_received_input' => $receivedMaterial,
+                'step2_processed_filters' => $filters,
+                'step3_total_products' => $totalProducts,
+                'step4_sample_metadata' => $sampleMetadata,
+                'step5_test_queries' => $testQueries,
+                'step6_search_service_result_count' => $resultCount,
+                'step7_sql_query' => $sqlQuery,
+                'step8_bindings' => $bindings,
+                'step9_all_materials_in_db' => $uniqueMaterials,
+                'step10_products_with_material_count' => $productsWithMaterial->count(),
+            ]); */
+        }
+        // ===== END DEBUG BLOCK =====
 
         $sortBy = $request->query('sort_by', 'newest');
         $limit = $request->query('limit', 12);
@@ -34,11 +96,6 @@ class ProductController extends Controller
                 $filters[$key] = explode(',', $filters[$key]);
             }
         }
-
-        // --- DEBUG POINT 2: Cek array $filters setelah diproses di controller ---
-        // Ini akan menunjukkan array filter yang akan diteruskan ke ProductSearch service.
-        // dd($filters);
-
 
         if ($request->has('vibe_name')) {
             $searchService->applyVibe($request->input('vibe_name'));
@@ -66,10 +123,6 @@ class ProductController extends Controller
                 $productsQuery->orderBy('created_at', 'desc');
                 break;
         }
-
-        // --- DEBUG POINT 3: Cek Query SQL final sebelum dieksekusi ---
-        // Ini adalah debug point paling penting untuk masalah database.
-        dd($productsQuery->toSql(), $productsQuery->getBindings());
 
         $products = $productsQuery->paginate($limit);
 
