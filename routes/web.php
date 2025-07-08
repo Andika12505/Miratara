@@ -54,6 +54,19 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/submit-ticket', [CustomerServiceController::class, 'submitTicket'])->name('submit_ticket');
     });
 
+    // Cart routes - MUST be in web middleware group for session access
+    Route::middleware(['web'])->prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/add', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/clear', [CartController::class, 'clear'])->name('cart.clear');
+    
+    // API routes for offcanvas
+    Route::get('/data', [CartController::class, 'getCartData'])->name('cart.data');
+    Route::get('/offcanvas-content', [CartController::class, 'getCartOffcanvasContent'])->name('cart.offcanvas.content');
+});
+
 });
 
 /*
@@ -76,14 +89,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin']
     Route::post('/check-availability', [UserController::class, 'checkAvailability'])->name('check-availability');
 });
 
-Route::prefix('cart')->name('cart.')->group(function () {
-    Route::get('/', [CartController::class, 'index'])->name('index'); // Halaman utama cart
-    Route::post('/add', [CartController::class, 'add'])->name('add'); // Menambah item
-    Route::post('/update/{id}', [CartController::class, 'update'])->name('update'); // Update kuantitas
-    Route::post('/remove/{id}', [CartController::class, 'remove'])->name('remove'); // Hapus item
-    Route::post('/clear', [CartController::class, 'clear'])->name('clear'); // Kosongkan cart
-});
-
 /*
 |--------------------------------------------------------------------------
 | Rute Lain-lain & Halaman Statis
@@ -104,6 +109,28 @@ Route::get('/stores', function() { return view('pages.stores'); })->name('stores
 Route::get('/product-care', function() { return view('pages.product-care'); })->name('product.care');
 Route::get('/gift-cards', function() { return view('pages.gift-cards'); })->name('gift.cards');
 
+/*
+|--------------------------------------------------------------------------
+| Cart Routes (Public - but needs session)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['web'])->prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/add', [CartController::class, 'add'])->name('cart.add');
+    
+    // Update quantity - should accept both POST and PATCH
+    Route::match(['POST', 'PATCH'], '/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
+    
+    // Remove item - should accept both DELETE and POST  
+    Route::match(['DELETE', 'POST'], '/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
+    
+    // Clear cart - should accept both DELETE and POST
+    Route::match(['DELETE', 'POST'], '/clear', [CartController::class, 'clear'])->name('cart.clear');
+    
+    // API routes for offcanvas
+    Route::get('/data', [CartController::class, 'getCartData'])->name('cart.data');
+    Route::get('/offcanvas-content', [CartController::class, 'getCartOffcanvasContent'])->name('cart.offcanvas.content');
+});
 
 /*
 |--------------------------------------------------------------------------
