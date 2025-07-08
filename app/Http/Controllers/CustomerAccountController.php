@@ -99,7 +99,6 @@ class CustomerAccountController extends Controller
                 Password::min(8)
                         ->mixedCase()
                         ->numbers()
-                        ->symbols()
             ],
         ]);
 

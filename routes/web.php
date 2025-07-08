@@ -11,6 +11,9 @@ use App\Http\Controllers\CustomerAccountController;
 use App\Http\Controllers\CustomerServiceController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\Admin\AdminDashboardController; 
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,9 +61,10 @@ Route::middleware(['auth'])->group(function () {
 | Rute untuk Admin Panel
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'is_admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin'])->group(function () {
     
-    Route::get('/dashboard', function () { return view('admin.dashboard'); })->name('dashboard');
+    // UBAH ATAU PASTIKAN ROUTE INI ADA
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // Manajemen User, Produk, Kategori
     Route::resource('users', UserController::class)->except(['show']);
@@ -70,6 +74,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'is_admi
     // Rute API/Data untuk Admin
     Route::get('/users-data', [UserController::class, 'getUsersJson'])->name('users.data');
     Route::post('/check-availability', [UserController::class, 'checkAvailability'])->name('check-availability');
+});
+
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index'); // Halaman utama cart
+    Route::post('/add', [CartController::class, 'add'])->name('add'); // Menambah item
+    Route::post('/update/{id}', [CartController::class, 'update'])->name('update'); // Update kuantitas
+    Route::post('/remove/{id}', [CartController::class, 'remove'])->name('remove'); // Hapus item
+    Route::post('/clear', [CartController::class, 'clear'])->name('clear'); // Kosongkan cart
 });
 
 /*

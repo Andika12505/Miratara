@@ -313,7 +313,6 @@ document.addEventListener("DOMContentLoaded", function () {
             length: value.length >= 8 && value.length <= 20,
             capital: /[A-Z]/.test(value),
             number: /\d/.test(value),
-            special: /[@!$#%^<>?_-]/.test(value),
         };
 
         updatePasswordRequirement("length", requirements.length);

@@ -226,7 +226,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     length: value.length >= 8 && value.length <= 20,
                     capital: /[A-Z]/.test(value),
                     number: /\d/.test(value),
-                    special: /[@!$#%^<>?_-]/.test(value),
                 };
 
                 passwordReqsElements.length.classList.toggle('valid', requirements.length); passwordReqsElements.length.classList.toggle('invalid', !requirements.length);

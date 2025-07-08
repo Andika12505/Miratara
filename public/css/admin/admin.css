@@ -40,58 +40,81 @@
   color: #000;
 }
 
-/* Sidebar */
-.sidebar {
-  background-color: #f8f9fa;
-  min-height: calc(100vh - 56px);
-  padding: 0;
-  border-right: 1px solid #dee2e6;
+/* Memberi ruang di atas untuk navbar yang fixed */
+body {
+    padding-top: 56px; 
 }
 
+.sidebar {
+    /* Membuat sidebar "menempel" di kiri layar */
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100; /* Posisinya di belakang navbar */
+    padding-top: 56px; /* Memberi ruang untuk navbar di atasnya */
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    width: 250px; /* TENTUKAN LEBAR PASTI UNTUK SIDEBAR */
+}
+
+/* Konten utama di sebelah kanan sidebar */
+.main-content {
+    /* Beri margin kiri seukuran lebar sidebar */
+    margin-left: 250px; 
+    padding: 20px;
+}
+
+/* ============================================= */
+/* == STYLING TAMPILAN (DARI ANDA) == */
+/* ============================================= */
+
+/* Anda bisa menyimpan semua styling Anda di bawah sini. */
+/* Saya hanya akan menimpa styling sidebar yang berkonflik. */
+
+/* Styling Sidebar Anda (sudah bagus) */
 .sidebar-content {
   padding: 20px 15px;
 }
-
 .sidebar-title {
-  color: #495057;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #dee2e6;
+  color: #495057; font-size: 0.9rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #dee2e6;
 }
-
 .sidebar .nav-link {
-  color: #6c757d;
-  padding: 12px 15px;
-  margin-bottom: 5px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  color: #6c757d; padding: 12px 15px; margin-bottom: 5px;
+  border-radius: 8px; transition: all 0.3s ease; font-weight: 500;
 }
-
 .sidebar .nav-link:hover {
-  color: #495057;
-  background-color: #e9ecef;
-  transform: translateX(5px);
+  color: #495057; background-color: #e9ecef; transform: translateX(5px);
 }
-
 .sidebar .nav-link.active {
-  color: #fff;
-  background-color: #ffc0cb;
-  border: none;
+  color: #fff; background-color: #ffc0cb; border: none;
 }
-
 .sidebar .nav-link.active:hover {
-  background-color: #ff8fab;
-  transform: translateX(5px);
+  background-color: #ff8fab; transform: translateX(5px);
 }
-
 .sidebar .nav-link i {
-  width: 20px;
-  text-align: center;
+  width: 20px; text-align: center;
+}
+/* ... (SEMUA KODE STYLING ANDA YANG LAIN SEPERTI CARD, BUTTON, DLL BISA DITARUH DI SINI) ... */
+
+
+/* ============================================= */
+/* == RESPONSIVE DESIGN (PENTING) == */
+/* ============================================= */
+
+/* Aturan untuk layar kecil (di bawah 768px) */
+@media (max-width: 767.98px) {
+  .sidebar {
+    /* Di layar kecil, biarkan sidebar dikontrol oleh Bootstrap Offcanvas */
+    /* Tidak perlu aturan khusus di sini, karena sudah dihandle HTML */
+  }
+
+  .main-content {
+    /* Di layar kecil, margin kiri dihilangkan agar konten memenuhi layar */
+    margin-left: 0;
+    padding: 15px;
+  }
 }
 
 /* Main Content */

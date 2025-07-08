@@ -14,29 +14,13 @@ class HomeController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index(): View
+    public function index()
     {
-        // Ambil 6 produk terbaru yang aktif untuk ditampilkan di homepage
-        $featuredProducts = Product::where('is_active', true)
-            ->where('stock', '>', 0) // Hanya produk yang masih ada stoknya
-            ->orderBy('created_at', 'desc')
-            ->limit(6)
-            ->get();
+        // 1. Ambil data dari database
+        $products = Product::latest()->get();
 
-        // Jika produk kurang dari 6, ambil produk lainnya untuk memenuhi slot
-        if ($featuredProducts->count() < 6) {
-            $additionalProducts = Product::where('is_active', true)
-                ->whereNotIn('id', $featuredProducts->pluck('id'))
-                ->orderBy('created_at', 'desc')
-                ->limit(6 - $featuredProducts->count())
-                ->get();
-            
-            $featuredProducts = $featuredProducts->concat($additionalProducts);
-        }
-
-        return view('home.index', [
-            'featuredProducts' => $featuredProducts
-        ]);
+        // 2. Kirim variabel 'products' ke view
+        return view('home.index', ['products' => $products]);
     }
 
     /**

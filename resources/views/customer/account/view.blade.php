@@ -175,7 +175,6 @@
                                         <li id="req-length">8-20 karakter</li>
                                         <li id="req-capital">1 huruf kapital (A-Z)</li>
                                         <li id="req-number">1 angka (0-9)</li>
-                                        <li id="req-special">1 karakter special (@!$#%^<>?_-)</li>
                                     </ul>
                                 </div>
                             </div>
@@ -537,7 +536,6 @@
                     length: value.length >= 8 && value.length <= 20,
                     capital: /[A-Z]/.test(value),
                     number: /\d/.test(value),
-                    special: /[@!$#%^<>?_-]/.test(value),
                 };
 
                 passwordReqsElements.length.classList.toggle('valid', requirements.length); passwordReqsElements.length.classList.toggle('invalid', !requirements.length);

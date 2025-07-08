@@ -35,7 +35,6 @@
           </a>
         </div>
 
-{{-- Ini adalah perbaikan untuk public layout, bukan admin --}}
 @auth {{-- Tampilkan ini jika user sudah login --}}
 <div class="nav-item dropdown">
     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">

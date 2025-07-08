@@ -76,7 +76,7 @@ class ProductController extends Controller
             'is_active' => $request->has('is_active'), // Checkbox akan mengirim nilai jika dicentang
         ]);
 
-        return redirect()->route('admin.products.index_page')->with('success', 'Produk berhasil ditambahkan!');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil ditambahkan!');
     }
 
     /**
@@ -136,7 +136,7 @@ class ProductController extends Controller
             'is_active' => $request->has('is_active'),
         ]);
 
-        return redirect()->route('admin.products.index_page')->with('success', 'Produk berhasil diperbarui!');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil diperbarui!');
     }
 
     /**
@@ -151,6 +151,6 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('admin.products.index_page')->with('success', 'Produk berhasil dihapus!');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus!');
     }
 }

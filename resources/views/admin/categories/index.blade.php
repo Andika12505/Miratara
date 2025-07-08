@@ -16,7 +16,7 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">Daftar Kategori</h6>
-            <a href="{{ route('admin.categories.create_page') }}" class="btn btn-primary btn-sm">Tambah Kategori</a>
+            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm">Tambah Kategori</a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -36,7 +36,7 @@
                             <td>{{ $category->name }}</td>
                             <td><code>{{ $category->slug }}</code></td>
                             <td>
-                                <a href="{{ route('admin.categories.edit_page', $category) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')

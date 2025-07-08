@@ -55,7 +55,6 @@
                                         <li id="req-length" class="req-item">8-20 karakter</li>
                                         <li id="req-capital" class="req-item">1 huruf kapital (A-Z)</li>
                                         <li id="req-number" class="req-item">1 angka (0-9)</li>
-                                        <li id="req-special" class="req-item">1 karakter special (@!$#%^&lt;&gt;?_-)</li>
                                     </ul>
                                 </div>
                             </div>

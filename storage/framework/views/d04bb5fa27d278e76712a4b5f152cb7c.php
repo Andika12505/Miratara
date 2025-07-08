@@ -14,22 +14,20 @@
     
     <?php echo $__env->yieldPushContent('styles'); ?>
     <style>
-        /* Custom styles for account icon and spacing in navbar */
-        /* Anda bisa memindahkan style ini ke file CSS eksternal jika diinginkan */
         .navbar .nav-login-button {
-            border: 1px solid #ffc0cb; /* MiraTara pink border */
+            border: 1px solid #ffc0cb;
             border-radius: 5px;
             padding: 8px 15px;
             text-decoration: none;
             color: #ffc0cb;
             transition: all 0.3s ease;
-            white-space: nowrap; /* Prevent wrapping */
+            white-space: nowrap;
         }
         .navbar .nav-login-button:hover {
             background-color: #ffc0cb;
             color: white;
         }
-        .navbar .nav-login-button.btn-primary { /* For Register button */
+        .navbar .nav-login-button.btn-primary {
             background-color: #ffc0cb;
             color: white;
         }
@@ -43,25 +41,116 @@
         .navbar-nav .nav-item.dropdown .nav-link i {
             margin-right: 5px;
         }
-        /* Penyesuaian umum untuk navbar agar ikon dan tombol berada di paling kanan */
         .navbar-collapse {
-            justify-content: flex-end !important; /* Dorong item ke kanan */
+            justify-content: flex-end !important;
         }
         .navbar-nav {
-            margin-left: auto !important; /* Pastikan menu utama didorong ke kiri */
+            margin-left: auto !important;
         }
         .d-flex.align-items-center {
-            margin-left: 1rem; /* Spasi antara menu utama dan tombol login/akun */
+            margin-left: 1rem;
         }
         .navbar-toggler {
             margin-left: 5px;
-            order: 2; /* Agartoggler tetap di kanan setelah tombol/ikon akun */
+            order: 2;
         }
         .navbar-brand {
-            margin-right: auto; /* Untuk logo tetap di kiri */
+            margin-right: auto;
         }
     </style>
 </head>
+
+
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const cartOffcanvasEl = document.getElementById('cartOffcanvas');
+    const offcanvasCartBody = document.getElementById('offcanvasCartBody');
+    const cartCountBadge = document.querySelector('.cart-count');
+
+    // FUNGSI UNTUK MENGAMBIL ISI CART & MENAMPILKANNYA
+    const fetchCartContent = async () => {
+        // Tampilkan loading spinner
+        offcanvasCartBody.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
+        
+        try {
+            // Kita perlu route baru untuk ini, misal '/cart/content'
+            // Untuk sekarang, kita akan render dari halaman cart index (kurang efisien, tapi bisa)
+            // Cara yang lebih baik adalah membuat endpoint API khusus.
+            // Mari kita asumsikan kita punya halaman /cart yang bisa kita fetch
+            const response = await fetch('<?php echo e(route("cart.index")); ?>');
+            const html = await response.text();
+            
+            // Ambil hanya bagian konten dari halaman cart
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const cartContent = doc.querySelector('.container').innerHTML;
+
+            offcanvasCartBody.innerHTML = cartContent;
+
+        } catch (error) {
+            console.error('Gagal memuat keranjang:', error);
+            offcanvasCartBody.innerHTML = '<p class="text-center text-danger">Gagal memuat keranjang. Silakan coba lagi.</p>';
+        }
+    };
+
+    // Saat offcanvas dibuka, panggil fungsi untuk memuat konten
+    cartOffcanvasEl.addEventListener('show.bs.offcanvas', function () {
+        fetchCartContent();
+    });
+
+    // FUNGSI UNTUK MENANGANI SUBMIT "ADD TO CART"
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const button = form.querySelector('button[type="submit"]');
+            const originalButtonText = button.innerHTML;
+            button.innerHTML = 'Menambahkan...';
+            button.disabled = true;
+
+            const formData = new FormData(form);
+
+            fetch('<?php echo e(route("cart.add")); ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update badge di navbar
+                    if(cartCountBadge) {
+                        cartCountBadge.textContent = data.cartCount;
+                    }
+                    
+                    // Beri feedback visual di tombol
+                    button.innerHTML = 'Ditambahkan!';
+                    setTimeout(() => {
+                        button.innerHTML = originalButtonText;
+                        button.disabled = false;
+                    }, 1500);
+
+                } else {
+                    throw new Error(data.message || 'Gagal menambahkan produk');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+                button.innerHTML = originalButtonText;
+                button.disabled = false;
+            });
+        });
+    });
+});
+</script>
+<?php $__env->stopPush(); ?>
 
 <body>
     <script src="<?php echo e(asset('js/bootstrap/bootstrap.bundle.min.js')); ?>"></script>
@@ -107,34 +196,51 @@
                         </li>
                     </ul>
 
-                    
-                    <div class="d-flex align-items-center ms-auto"> 
-                        <?php if(auth()->guard()->check()): ?> 
-                        <div class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <?php if(Auth::user()->profile_photo_path): ?>
-            <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo_path)); ?>" alt="Foto" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
-        <?php else: ?>
-            <i class="fas fa-user-circle fa-lg me-2"></i>
-        <?php endif; ?>
-        <?php echo e(Auth::user()->username); ?>
+                    <div class="d-flex align-items-center ms-auto">
 
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
-        <li><a class="dropdown-item" href="<?php echo e(route('customer.account.view')); ?>">Lihat Akun</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li>
-            <form id="logout-form-customer" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
-                <?php echo csrf_field(); ?>
-            </form>
-            <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form-customer').submit();">Logout</a>
-        </li>
-    </ul>
-</div
-                        <?php else: ?> 
-                        <a href="<?php echo e(route('login_page')); ?>" class="nav-login-button me-2">Login</a>
-                        <a href="<?php echo e(route('register_page')); ?>" class="nav-login-button btn-primary">Register</a>
-                        <?php endif; ?>
+                        
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="offcanvas" href="#cartOffcanvas" role="button" aria-controls="cartOffcanvas">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span class="badge rounded-pill bg-danger cart-count">
+                                        <?php echo e(Cart::count() > 0 ? Cart::count() : ''); ?>
+
+                                    </span>
+                                </a>
+                            </li>
+                            </li>
+                        </ul>
+
+                        
+                        <div class="ms-3">
+                            <?php if(auth()->guard()->check()): ?>
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <?php if(Auth::user()->profile_photo_path): ?>
+                                        <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo_path)); ?>" alt="Foto" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <i class="fas fa-user-circle fa-lg me-2"></i>
+                                    <?php endif; ?>
+                                    <?php echo e(Auth::user()->username); ?>
+
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
+                                    <li><a class="dropdown-item" href="<?php echo e(route('customer.account.view')); ?>">Lihat Akun</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form id="logout-form-customer" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
+                                            <?php echo csrf_field(); ?>
+                                        </form>
+                                        <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form-customer').submit();">Logout</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <?php else: ?>
+                            <a href="<?php echo e(route('login_page')); ?>" class="nav-login-button me-2">Login</a>
+                            <a href="<?php echo e(route('register_page')); ?>" class="nav-login-button btn-primary">Register</a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -142,6 +248,21 @@
     </section>
 
     <?php echo $__env->yieldContent('content'); ?>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title" id="cartOffcanvasLabel">
+        <i class="fas fa-shopping-cart me-2"></i> Keranjang Belanja
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body" id="offcanvasCartBody">
+    
+    <div class="text-center py-5">
+        <p>Keranjang Anda kosong.</p>
+    </div>
+  </div>
+</div>
 
     <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>

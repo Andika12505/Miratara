@@ -1,4 +1,15 @@
 <?php return array (
+  'hardevine/shoppingcart' => 
+  array (
+    'aliases' => 
+    array (
+      'Cart' => 'Gloudemans\\Shoppingcart\\Facades\\Cart',
+    ),
+    'providers' => 
+    array (
+      0 => 'Gloudemans\\Shoppingcart\\ShoppingcartServiceProvider',
+    ),
+  ),
   'laravel/breeze' => 
   array (
     'providers' => 
