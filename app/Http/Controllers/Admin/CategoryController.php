@@ -41,7 +41,7 @@ class CategoryController extends Controller
             'slug' => \Illuminate\Support\Str::slug($request->slug), // Pastikan slug di-format dengan baik
         ]);
 
-        return redirect()->route('admin.categories.index_page')->with('success', 'Kategori berhasil ditambahkan!');
+        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
@@ -87,7 +87,7 @@ class CategoryController extends Controller
             'slug' => \Illuminate\Support\Str::slug($request->slug),
         ]);
 
-        return redirect()->route('admin.categories.index_page')->with('success', 'Kategori berhasil diperbarui!');
+        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil diperbarui!');
     }
 
     /**
@@ -99,6 +99,6 @@ class CategoryController extends Controller
         // Kita sudah pakai onDelete('cascade') di migrasi, jadi ini aman.
         $category->delete();
 
-        return redirect()->route('admin.categories.index_page')->with('success', 'Kategori berhasil dihapus!');
+        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil dihapus!');
     }
 }

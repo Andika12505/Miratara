@@ -81,7 +81,7 @@
                     <label class="form-check-label" for="is_active">Produk Aktif</label>
                 </div>
                 <button type="submit" class="btn btn-primary">Update Produk</button>
-                <a href="{{ route('admin.products.index_page') }}" class="btn btn-secondary">Batal</a>
+                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
             </form>
         </div>
     </div>

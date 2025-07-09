@@ -24,52 +24,26 @@
                 </div>
             </div>
 
-            <div class="row g-4">
-                <?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="product-card">
-                        <div class="product-image-container position-relative">
-                            <?php if(isset($product->metadata['is_discounted']) && $product->metadata['is_discounted']): ?>
-                            <div class="discount-badge">
-                                <span>DISKON</span>
-                            </div>
-                            <?php endif; ?>
-
-                            <img src="<?php echo e($product->image ? asset('images/' . $product->image) : asset('images/placeholder.jpg')); ?>" 
-                                 alt="<?php echo e($product->name); ?>" 
-                                 class="product-image">
-                        </div>
-
-                        <div class="product-info">
-                            <h3 class="product-title"><?php echo e($product->name); ?></h3>
-
-                            <div class="product-pricing">
-                                <?php if(isset($product->metadata['original_price']) && $product->metadata['original_price']): ?>
-                                <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
-                                <span class="original-price">Rp <?php echo e(number_format($product->metadata['original_price'], 0, ',', '.')); ?></span>
-                                <?php else: ?>
-                                <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
-                                <?php endif; ?>
-                            </div>
-
-                            <button class="add-to-bag-btn" 
-                                    data-product-id="<?php echo e($product->id); ?>"
-                                    <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
-                                <?php echo e($product->stock <= 0 ? 'HABIS' : 'TAMBAH KE KERANJANG'); ?>
-
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <div class="col-12">
-                    <div class="text-center py-5">
-                        <p class="text-muted">Tidak ada produk yang ditemukan dengan filter ini.</p>
-                        <a href="<?php echo e(route('products.index')); ?>" class="btn btn-primary mt-3">Reset Semua Filter</a>
-                    </div>
-                </div>
-                <?php endif; ?>
-            </div>
+            <?php if (isset($component)) { $__componentOriginal4d695489bf05cd3a8e675a0f0518ee14 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14 = $attributes; } ?>
+<?php $component = App\View\Components\ProductGrid::resolve(['products' => $products,'showDiscount' => true,'useFormCart' => true,'emptyMessage' => 'No filtered products available at the moment.','emptyButtonText' => 'Reset Filters','emptyButtonClass' => 'btn btn-primary','buttonText' => 'ADD TO BAG','outOfStockText' => 'OUT OF STOCK'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('product-grid'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\ProductGrid::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14)): ?>
+<?php $attributes = $__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14; ?>
+<?php unset($__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4d695489bf05cd3a8e675a0f0518ee14)): ?>
+<?php $component = $__componentOriginal4d695489bf05cd3a8e675a0f0518ee14; ?>
+<?php unset($__componentOriginal4d695489bf05cd3a8e675a0f0518ee14); ?>
+<?php endif; ?>
 
             <?php if($products->hasPages()): ?>
             <div class="row mt-5">
@@ -119,23 +93,7 @@
     padding: 8px 12px;
 }
 
-/* Product Card & Image Styles (Dipertahankan dari sebelumnya) */
-.product-card .product-image-container {
-    position: relative;
-    overflow: hidden;
-    background: #f8f9fa;
-    border-radius: 0;
-}
-.product-card .product-image {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    transition: transform 0.3s ease;
-}
-.product-card:hover .product-image {
-    transform: scale(1.02);
-}
+/* === SHARED PRODUCT CARD STYLES === */
 .product-card {
     background: #fff;
     border-radius: 0;
@@ -143,33 +101,83 @@
     transition: transform 0.3s ease;
     border: none;
     box-shadow: none;
-    height: auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
+
 .product-card:hover {
     transform: translateY(-5px);
 }
+
+.product-image-container {
+    position: relative;
+    overflow: hidden;
+    background: #f8f9fa;
+    border-radius: 0;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.02);
+}
+
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #ff69b4;
+    color: white;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    z-index: 2;
+}
+
 .product-info {
     padding: 20px 0;
     text-align: center;
-    flex-shrink: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
+
 .product-title {
     font-size: 16px;
     font-weight: 400;
     color: #333;
     margin-bottom: 10px;
     line-height: 1.4;
+    flex-grow: 1;
 }
+
 .product-pricing {
     margin-bottom: 15px;
 }
+
 .current-price {
     font-size: 14px;
     font-weight: 600;
     color: #333;
+    margin-right: 8px;
 }
+
+.original-price {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+}
+
 .add-to-bag-btn {
     background: transparent;
     border: 1px solid #333;
@@ -183,30 +191,35 @@
     text-transform: uppercase;
     min-height: 40px;
     width: 100%;
-    display: block;
-    margin: 0 auto;
 }
+
 .add-to-bag-btn:hover:not(:disabled) {
     background: #333;
     color: white;
 }
+
 .add-to-bag-btn:disabled {
     background: #f5f5f5;
     border-color: #ddd;
     color: #999;
     cursor: not-allowed;
 }
+
+/* Grid layout for both pages */
 .row.g-4 {
     display: flex;
     flex-wrap: wrap;
 }
+
 .row.g-4 > [class*="col-"] {
     display: flex;
     margin-bottom: 2rem;
 }
+
 .row.g-4 .product-card {
     width: 100%;
 }
+
 /* Pagination */
 .pagination {
     justify-content: center;
@@ -226,7 +239,7 @@
     border-color: #ddd;
 }
 
-/* --- Styling untuk Sidebar Pop-Out BARU --- */
+/* --- Styling untuk Sidebar Pop-Out --- */
 .filter-sidebar {
     position: fixed;
     top: 0;
@@ -392,22 +405,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const openFilterSidebarBtn = document.getElementById('openFilterSidebarBtn');
     const closeSidebarBtn = document.querySelector('.close-sidebar-btn');
-    const filterFormSidebar = document.getElementById('filterFormSidebar'); // Form di dalam sidebar
+    const filterFormSidebar = document.getElementById('filterFormSidebar');
 
-    // Fungsi untuk membuka sidebar
+    // Filter sidebar functionality (keep as is)
     if (openFilterSidebarBtn) {
         openFilterSidebarBtn.addEventListener('click', function() {
             filterSidebar.classList.add('open');
             sidebarOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Mencegah scroll body saat sidebar terbuka
+            document.body.style.overflow = 'hidden';
         });
     }
 
-    // Fungsi untuk menutup sidebar
     function closeFilterSidebar() {
         filterSidebar.classList.remove('open');
         sidebarOverlay.classList.remove('active');
-        document.body.style.overflow = ''; // Mengizinkan scroll body kembali
+        document.body.style.overflow = '';
     }
 
     if (closeSidebarBtn) {
@@ -415,90 +427,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeFilterSidebar); // Tutup saat klik overlay
+        sidebarOverlay.addEventListener('click', closeFilterSidebar);
     }
 
-    // Tangani perubahan pada input form filter di sidebar
-    // Gunakan event delegation pada form untuk performa yang lebih baik
     if (filterFormSidebar) {
         filterFormSidebar.addEventListener('change', function(event) {
-            // Periksa apakah perubahan terjadi pada radio button kategori
             if (event.target.type === 'radio' && event.target.name === 'category_id') {
-                this.submit(); // Langsung submit form jika kategori dipilih
+                this.submit();
             }
-            // Checkbox dan input harga akan disubmit melalui tombol "Terapkan Filter"
         });
     }
 
-    // Handle sort change (fungsi yang sudah ada)
+    // Sort functionality (keep as is)
     window.handleSortChange = function() {
         const sortSelect = document.getElementById('sortSelect');
         const currentUrl = new URL(window.location.href);
 
         currentUrl.searchParams.set('sort_by', sortSelect.value);
-        currentUrl.searchParams.delete('page'); // Reset halaman ke 1 saat sorting berubah
+        currentUrl.searchParams.delete('page');
 
         window.location.href = currentUrl.toString();
     }
 
-    // Add to bag functionality (sudah ada di kode Anda)
-    // Pastikan fungsi updateCartCount() ada di global scope atau diakses dengan benar
-    document.querySelectorAll('.add-to-bag-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (this.disabled) return;
-            const productId = this.getAttribute('data-product-id');
-            const originalText = this.textContent;
-            this.textContent = 'ADDING...';
-            this.disabled = true;
-
-            fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ product_id: productId, quantity: 1 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    this.textContent = 'ADDED!';
-                    this.style.background = '#28a745';
-                    this.style.borderColor = '#28a745';
-                    this.style.color = 'white';
-                    setTimeout(() => {
-                        this.textContent = originalText;
-                        this.disabled = false;
-                        this.style.background = '';
-                        this.style.borderColor = '';
-                        this.style.color = '';
-                    }, 2000);
-                    if (typeof updateCartCount === 'function') { // Check if updateCartCount exists
-                        updateCartCount();
-                    }
-                } else {
-                    throw new Error(data.message || 'Failed to add product to bag.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
-                this.textContent = originalText;
-                this.disabled = false;
-            });
-        });
-    });
 });
-
-// Dummy function for updateCartCount if it's not defined in layouts/main.blade.php
-// If you have a global script for this, you can remove this.
-if (typeof updateCartCount === 'undefined') {
-    function updateCartCount() {
-        console.log('Cart count updated placeholder.');
-        // Implement actual AJAX call to get and update cart count
-    }
-}
 </script>
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>

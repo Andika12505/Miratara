@@ -1,5 +1,3 @@
-{{-- MTGemini/resources/views/products/index.blade.php --}}
-
 @extends('layouts.main')
 
 @section('title', 'Products - MiraTara Fashion')
@@ -8,7 +6,7 @@
 <div class="container-fluid px-4 py-4">
     <div class="row">
         {{-- Bagian Konten Produk Utama --}}
-        <div class="col-12"> {{-- Awalnya ini col-lg-9 col-md-8, kita buat 100% lebar untuk layout pop-out --}}
+        <div class="col-12"> 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="section-title">Our Products</h2>
                 <div class="sorting-and-filter-options d-flex align-items-center">
@@ -28,51 +26,16 @@
                 </div>
             </div>
 
-            <div class="row g-4">
-                @forelse($products as $product)
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="product-card">
-                        <div class="product-image-container position-relative">
-                            @if(isset($product->metadata['is_discounted']) && $product->metadata['is_discounted'])
-                            <div class="discount-badge">
-                                <span>DISKON</span>
-                            </div>
-                            @endif
-
-                            <img src="{{ $product->image ? asset('images/' . $product->image) : asset('images/placeholder.jpg') }}" 
-                                 alt="{{ $product->name }}" 
-                                 class="product-image">
-                        </div>
-
-                        <div class="product-info">
-                            <h3 class="product-title">{{ $product->name }}</h3>
-
-                            <div class="product-pricing">
-                                @if(isset($product->metadata['original_price']) && $product->metadata['original_price'])
-                                <span class="current-price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                                <span class="original-price">Rp {{ number_format($product->metadata['original_price'], 0, ',', '.') }}</span>
-                                @else
-                                <span class="current-price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                                @endif
-                            </div>
-
-                            <button class="add-to-bag-btn" 
-                                    data-product-id="{{ $product->id }}"
-                                    {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                {{ $product->stock <= 0 ? 'HABIS' : 'TAMBAH KE KERANJANG' }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <div class="col-12">
-                    <div class="text-center py-5">
-                        <p class="text-muted">Tidak ada produk yang ditemukan dengan filter ini.</p>
-                        <a href="{{ route('products.index') }}" class="btn btn-primary mt-3">Reset Semua Filter</a>
-                    </div>
-                </div>
-                @endforelse
-            </div>
+            <x-product-grid 
+                :products="$products"
+                :show-discount="true"
+                :use-form-cart="true"
+                empty-message="No filtered products available at the moment."
+                empty-button-text="Reset Filters"
+                empty-button-class="btn btn-primary"
+                button-text="ADD TO BAG"
+                out-of-stock-text="OUT OF STOCK"
+            />
 
             @if($products->hasPages())
             <div class="row mt-5">
@@ -85,7 +48,7 @@
     </div>
 </div>
 
-{{-- SERTAKAN PARTIAL FILTER SIDEBAR DI SINI --}}
+{{-- PARTIAL FILTER SIDEBAR DI SINI --}}
 @include('partials.product_filter_sidebar', [
     'categories' => $categories,
     'availableVibeAttributes' => $availableVibeAttributes,
@@ -121,23 +84,7 @@
     padding: 8px 12px;
 }
 
-/* Product Card & Image Styles (Dipertahankan dari sebelumnya) */
-.product-card .product-image-container {
-    position: relative;
-    overflow: hidden;
-    background: #f8f9fa;
-    border-radius: 0;
-}
-.product-card .product-image {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    transition: transform 0.3s ease;
-}
-.product-card:hover .product-image {
-    transform: scale(1.02);
-}
+/* === SHARED PRODUCT CARD STYLES === */
 .product-card {
     background: #fff;
     border-radius: 0;
@@ -145,33 +92,83 @@
     transition: transform 0.3s ease;
     border: none;
     box-shadow: none;
-    height: auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
+
 .product-card:hover {
     transform: translateY(-5px);
 }
+
+.product-image-container {
+    position: relative;
+    overflow: hidden;
+    background: #f8f9fa;
+    border-radius: 0;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.02);
+}
+
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #ff69b4;
+    color: white;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    z-index: 2;
+}
+
 .product-info {
     padding: 20px 0;
     text-align: center;
-    flex-shrink: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
+
 .product-title {
     font-size: 16px;
     font-weight: 400;
     color: #333;
     margin-bottom: 10px;
     line-height: 1.4;
+    flex-grow: 1;
 }
+
 .product-pricing {
     margin-bottom: 15px;
 }
+
 .current-price {
     font-size: 14px;
     font-weight: 600;
     color: #333;
+    margin-right: 8px;
 }
+
+.original-price {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+}
+
 .add-to-bag-btn {
     background: transparent;
     border: 1px solid #333;
@@ -185,30 +182,35 @@
     text-transform: uppercase;
     min-height: 40px;
     width: 100%;
-    display: block;
-    margin: 0 auto;
 }
+
 .add-to-bag-btn:hover:not(:disabled) {
     background: #333;
     color: white;
 }
+
 .add-to-bag-btn:disabled {
     background: #f5f5f5;
     border-color: #ddd;
     color: #999;
     cursor: not-allowed;
 }
+
+/* Grid layout for both pages */
 .row.g-4 {
     display: flex;
     flex-wrap: wrap;
 }
+
 .row.g-4 > [class*="col-"] {
     display: flex;
     margin-bottom: 2rem;
 }
+
 .row.g-4 .product-card {
     width: 100%;
 }
+
 /* Pagination */
 .pagination {
     justify-content: center;
@@ -228,7 +230,7 @@
     border-color: #ddd;
 }
 
-/* --- Styling untuk Sidebar Pop-Out BARU --- */
+/* --- Styling untuk Sidebar Pop-Out --- */
 .filter-sidebar {
     position: fixed;
     top: 0;
@@ -394,22 +396,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const openFilterSidebarBtn = document.getElementById('openFilterSidebarBtn');
     const closeSidebarBtn = document.querySelector('.close-sidebar-btn');
-    const filterFormSidebar = document.getElementById('filterFormSidebar'); // Form di dalam sidebar
+    const filterFormSidebar = document.getElementById('filterFormSidebar');
 
-    // Fungsi untuk membuka sidebar
+    // Filter sidebar functionality (keep as is)
     if (openFilterSidebarBtn) {
         openFilterSidebarBtn.addEventListener('click', function() {
             filterSidebar.classList.add('open');
             sidebarOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Mencegah scroll body saat sidebar terbuka
+            document.body.style.overflow = 'hidden';
         });
     }
 
-    // Fungsi untuk menutup sidebar
     function closeFilterSidebar() {
         filterSidebar.classList.remove('open');
         sidebarOverlay.classList.remove('active');
-        document.body.style.overflow = ''; // Mengizinkan scroll body kembali
+        document.body.style.overflow = '';
     }
 
     if (closeSidebarBtn) {
@@ -417,90 +418,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeFilterSidebar); // Tutup saat klik overlay
+        sidebarOverlay.addEventListener('click', closeFilterSidebar);
     }
 
-    // Tangani perubahan pada input form filter di sidebar
-    // Gunakan event delegation pada form untuk performa yang lebih baik
     if (filterFormSidebar) {
         filterFormSidebar.addEventListener('change', function(event) {
-            // Periksa apakah perubahan terjadi pada radio button kategori
             if (event.target.type === 'radio' && event.target.name === 'category_id') {
-                this.submit(); // Langsung submit form jika kategori dipilih
+                this.submit();
             }
-            // Checkbox dan input harga akan disubmit melalui tombol "Terapkan Filter"
         });
     }
 
-    // Handle sort change (fungsi yang sudah ada)
+    // Sort functionality (keep as is)
     window.handleSortChange = function() {
         const sortSelect = document.getElementById('sortSelect');
         const currentUrl = new URL(window.location.href);
 
         currentUrl.searchParams.set('sort_by', sortSelect.value);
-        currentUrl.searchParams.delete('page'); // Reset halaman ke 1 saat sorting berubah
+        currentUrl.searchParams.delete('page');
 
         window.location.href = currentUrl.toString();
     }
 
-    // Add to bag functionality (sudah ada di kode Anda)
-    // Pastikan fungsi updateCartCount() ada di global scope atau diakses dengan benar
-    document.querySelectorAll('.add-to-bag-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (this.disabled) return;
-            const productId = this.getAttribute('data-product-id');
-            const originalText = this.textContent;
-            this.textContent = 'ADDING...';
-            this.disabled = true;
-
-            fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ product_id: productId, quantity: 1 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    this.textContent = 'ADDED!';
-                    this.style.background = '#28a745';
-                    this.style.borderColor = '#28a745';
-                    this.style.color = 'white';
-                    setTimeout(() => {
-                        this.textContent = originalText;
-                        this.disabled = false;
-                        this.style.background = '';
-                        this.style.borderColor = '';
-                        this.style.color = '';
-                    }, 2000);
-                    if (typeof updateCartCount === 'function') { // Check if updateCartCount exists
-                        updateCartCount();
-                    }
-                } else {
-                    throw new Error(data.message || 'Failed to add product to bag.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
-                this.textContent = originalText;
-                this.disabled = false;
-            });
-        });
-    });
 });
-
-// Dummy function for updateCartCount if it's not defined in layouts/main.blade.php
-// If you have a global script for this, you can remove this.
-if (typeof updateCartCount === 'undefined') {
-    function updateCartCount() {
-        console.log('Cart count updated placeholder.');
-        // Implement actual AJAX call to get and update cart count
-    }
-}
 </script>
 @endpush
 @endsection

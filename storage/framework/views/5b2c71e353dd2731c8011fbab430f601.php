@@ -28,68 +28,6 @@
     </style>
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="<?php echo e(route('homepage')); ?>">
-                <img src="<?php echo e(asset('images/logo1.png')); ?>" alt="MiraTara Logo"> MiraTara
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo e(route('homepage')); ?>">Beranda</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Produk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Keranjang</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Kontak</a>
-                    </li>
-                    <?php if(auth()->guard()->check()): ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <?php if(Auth::user()->profile_photo_path): ?>
-                                <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo_path)); ?>" alt="Foto" class="rounded-circle me-2" style="width: 25px; height: 25px; object-fit: cover;">
-                            <?php else: ?>
-                                <i class="fas fa-user-circle fa-lg me-2"></i>
-                            <?php endif; ?>
-                            <?php echo e(Auth::user()->username); ?>
-
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
-                            <li>
-                                <a class="dropdown-item" href="<?php echo e(route('customer.account.view')); ?>">Lihat Akun</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form id="logout-form-customer" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
-                                    <?php echo csrf_field(); ?>
-                                </form>
-                                <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form-customer').submit();">Logout</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <?php else: ?>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-primary ms-2" href="<?php echo e(route('login_page')); ?>">Masuk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-primary ms-2" href="<?php echo e(route('register_page')); ?>">Daftar</a>
-                    </li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container py-4">
         <div class="account-header">
             <h1>Akun Saya</h1>
@@ -640,4 +578,5 @@
         });
     </script>
 </body>
-</html><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/customer/account/view.blade.php ENDPATH**/ ?>
+</html>
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/customer/account/view.blade.php ENDPATH**/ ?>

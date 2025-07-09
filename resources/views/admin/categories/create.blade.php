@@ -30,7 +30,7 @@
                     <small class="form-text text-muted">Akan digunakan di URL, contoh: elektronik-terbaru</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Simpan Kategori</button>
-                <a href="{{ route('admin.categories.index_page') }}" class="btn btn-secondary">Batal</a>
+                <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Batal</a>
             </form>
         </div>
     </div>

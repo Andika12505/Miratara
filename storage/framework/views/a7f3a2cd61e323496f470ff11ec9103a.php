@@ -4,10 +4,10 @@
 <section id="home" class="home overflow-hidden">
     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" 
-                    class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" 
-                    aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0"
+                class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                aria-label="Slide 2"></button>
         </div>
         <div class="carousel-inner">
             <div class="carousel-item active">
@@ -17,7 +17,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="carousel-item">
                 <div class="home-banner home-banner-2" style="background-image: url('<?php echo e(asset('images/miaw2.png')); ?>');">
                     <div class="home-banner-text">
@@ -41,68 +40,48 @@
 
 <section id="products" class="products">
     <div class="container">
+        <!-- Header Section -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="headline text-center mb-5">
-                    <h2 class="pb-3 position-relative d-idline-block">OUR PRODUCT</h2>
+                    <h2 class="pb-3 position-relative d-inline-block">Our Products</h2>
                 </div>
             </div>
         </div>
-
-        <div class="row g-4">
-            <?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <div class="product-card">
-                    <div class="product-image-container position-relative">
-                        
-                        <img src="<?php echo e($product->image ? asset('images/' . $product->image) : 'https://via.placeholder.com/400x600/f8f9fa/6c757d?text=' . urlencode($product->name)); ?>" 
-                             alt="<?php echo e($product->name); ?>" 
-                             class="product-image"
-                             onerror="this.src='https://via.placeholder.com/400x600/f8f9fa/6c757d?text=No+Image'">
-                    </div>
-                    
-                    <div class="product-info">
-                        <h3 class="product-title"><?php echo e($product->name); ?></h3>
-                        
-                        <div class="product-pricing">
-                            <span class="current-price">Rp <?php echo e(number_format($product->price, 0, ',', '.')); ?></span>
-                        </div>
-                        
-                        
-                        <form action="<?php echo e(route('cart.add')); ?>" method="POST" class="d-grid add-to-cart-form">
-                            <?php echo csrf_field(); ?>
-                            <input type="hidden" name="id" value="<?php echo e($product->id); ?>">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="add-to-bag-btn" <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
-                                <?php echo e($product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO BAG'); ?>
-
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-            <!-- Fallback jika tidak ada produk -->
-            <div class="col-12">
-                <div class="text-center py-5">
-                    <p class="text-muted">No featured products available at the moment.</p>
+        
+        <!-- Product Grid Component -->
+        <?php if (isset($component)) { $__componentOriginal4d695489bf05cd3a8e675a0f0518ee14 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14 = $attributes; } ?>
+<?php $component = App\View\Components\ProductGrid::resolve(['products' => $products,'showDiscount' => false,'useFormCart' => true,'emptyMessage' => 'No featured products available at the moment.','emptyButtonText' => 'View All Products','emptyButtonClass' => 'btn-carousel','buttonText' => 'ADD TO BAG','outOfStockText' => 'OUT OF STOCK'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('product-grid'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\ProductGrid::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14)): ?>
+<?php $attributes = $__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14; ?>
+<?php unset($__attributesOriginal4d695489bf05cd3a8e675a0f0518ee14); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4d695489bf05cd3a8e675a0f0518ee14)): ?>
+<?php $component = $__componentOriginal4d695489bf05cd3a8e675a0f0518ee14; ?>
+<?php unset($__componentOriginal4d695489bf05cd3a8e675a0f0518ee14); ?>
+<?php endif; ?>
+        
+        <!-- View All Products Link (only show if products exist) -->
+        <?php if($products->count() > 0): ?>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
                     <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel">View All Products</a>
                 </div>
             </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Link to view all products -->
-        <?php if($products->count() > 0): ?>
-        <div class="row mt-4">
-            <div class="col-12 text-center">
-                <a href="<?php echo e(route('products.index')); ?>" class="btn-carousel">View All Products</a>
-            </div>
-        </div>
         <?php endif; ?>
     </div>
 </section>
-
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('styles'); ?>
 <style>
@@ -112,7 +91,7 @@
     margin: 0 auto;
 }
 
-/* Use exact same product card styling as products page */
+/* === SHARED PRODUCT CARD STYLES === */
 .product-card {
     background: #fff;
     border-radius: 0;
@@ -134,20 +113,18 @@
     overflow: hidden;
     background: #f8f9fa;
     border-radius: 0;
-    /* Let container adjust to image height naturally */
 }
 
 .product-image {
     width: 100%;
-    height: auto; /* Let image determine its own height */
+    height: auto;
     object-fit: contain;
     display: block;
     transition: transform 0.3s ease;
-    /* Remove all height constraints - let image be natural */
 }
 
 .product-card:hover .product-image {
-    transform: scale(1.02); /* Reduced from 1.05 to prevent overflow */
+    transform: scale(1.02);
 }
 
 .discount-badge {
@@ -211,6 +188,7 @@
     transition: all 0.3s ease;
     text-transform: uppercase;
     min-height: 40px;
+    width: 100%;
 }
 
 .add-to-bag-btn:hover:not(:disabled) {
@@ -223,6 +201,21 @@
     border-color: #ddd;
     color: #999;
     cursor: not-allowed;
+}
+
+/* Grid layout for both pages */
+.row.g-4 {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.row.g-4 > [class*="col-"] {
+    display: flex;
+    margin-bottom: 2rem;
+}
+
+.row.g-4 .product-card {
+    width: 100%;
 }
 
 /* Keep existing carousel and navigation styles */
@@ -403,6 +396,4 @@ img{
 }
 </style>
 <?php $__env->stopPush(); ?>
-
-
 <?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/home/index.blade.php ENDPATH**/ ?>
