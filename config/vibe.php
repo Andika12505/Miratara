@@ -1,7 +1,4 @@
 <?php
-
-// MTGemini/config/vibe.php
-
 return [
     'definitions' => [
         'beach_getaway' => [

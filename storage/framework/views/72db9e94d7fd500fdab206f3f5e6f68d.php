@@ -15,7 +15,7 @@
         /* YOUR ORIGINAL STYLES - Keep these */
         /* Main content offset for fixed navbar */
         body {
-            padding-top: 80px; /* Adjust this value based on your navbar height */
+            padding-top: 22px; /* Adjust this value based on your navbar height */
         }
         
         /* Navbar styling */
@@ -103,11 +103,78 @@
                     <ul class="navbar-nav justify-content-center mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link mx-lg-2 <?php if(Request::routeIs('homepage')): ?> active <?php endif; ?>" 
-                               aria-current="page" href="<?php echo e(route('homepage')); ?>">Home</a>
+                            aria-current="page" href="<?php echo e(route('homepage')); ?>">Home</a>
                         </li>
+                        
+                        <!-- NEW: Find Your Vibe Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle mx-lg-2 vibe-nav-link" href="#" role="button" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-sparkles me-1"></i>Find Your Vibe
+                            </a>
+                            <ul class="dropdown-menu vibe-dropdown">
+                                <li class="dropdown-header">Discover Your Perfect Style</li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item vibe-dropdown-item" 
+                                    href="<?php echo e(route('products.index', ['vibe_name' => 'beach_getaway'])); ?>">
+                                        <div class="vibe-dropdown-content">
+                                            <i class="fas fa-umbrella-beach vibe-dropdown-icon beach-color"></i>
+                                            <div class="vibe-dropdown-text">
+                                                <span class="vibe-dropdown-title">Beach Getaway</span>
+                                                <small class="vibe-dropdown-desc">Casual & breezy vacation vibes</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item vibe-dropdown-item" 
+                                    href="<?php echo e(route('products.index', ['vibe_name' => 'elegant_evening'])); ?>">
+                                        <div class="vibe-dropdown-content">
+                                            <i class="fas fa-cocktail vibe-dropdown-icon elegant-color"></i>
+                                            <div class="vibe-dropdown-text">
+                                                <span class="vibe-dropdown-title">Elegant Evening</span>
+                                                <small class="vibe-dropdown-desc">Sophisticated occasion wear</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item vibe-dropdown-item" 
+                                    href="<?php echo e(route('products.index', ['vibe_name' => 'sporty_active'])); ?>">
+                                        <div class="vibe-dropdown-content">
+                                            <i class="fas fa-dumbbell vibe-dropdown-icon sporty-color"></i>
+                                            <div class="vibe-dropdown-text">
+                                                <span class="vibe-dropdown-title">Sporty Active</span>
+                                                <small class="vibe-dropdown-desc">Performance & comfort</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item vibe-dropdown-item" 
+                                    href="<?php echo e(route('products.index', ['vibe_name' => 'daily_casual'])); ?>">
+                                        <div class="vibe-dropdown-content">
+                                            <i class="fas fa-coffee vibe-dropdown-icon casual-color"></i>
+                                            <div class="vibe-dropdown-text">
+                                                <span class="vibe-dropdown-title">Daily Casual</span>
+                                                <small class="vibe-dropdown-desc">Everyday essentials</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item browse-all-vibes" href="<?php echo e(route('products.index')); ?>">
+                                        <i class="fas fa-search me-2"></i>Browse All Products
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle mx-lg-2" href="#" role="button" 
-                               data-bs-toggle="dropdown" aria-expanded="false">
+                            data-bs-toggle="dropdown" aria-expanded="false">
                                 Women's
                             </a>
                             <ul class="dropdown-menu">
@@ -119,7 +186,7 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle mx-lg-2" href="#" role="button" 
-                               data-bs-toggle="dropdown" aria-expanded="false">
+                            data-bs-toggle="dropdown" aria-expanded="false">
                                 Accessories
                             </a>
                             <ul class="dropdown-menu">
@@ -136,7 +203,7 @@
                         <ul class="navbar-nav">
                             <li class="nav-item">
                                 <a class="nav-link mx-lg-2" data-bs-toggle="offcanvas" href="#cartOffcanvas" 
-                                   role="button" aria-controls="cartOffcanvas" title="Keranjang Belanja">
+                                role="button" aria-controls="cartOffcanvas" title="Keranjang Belanja">
                                     <i class="fas fa-shopping-cart"></i>
                                     <span class="badge rounded-pill bg-danger cart-count">
                                         <?php echo e(Cart::count() > 0 ? Cart::count() : ''); ?>
@@ -151,11 +218,11 @@
                             <?php if(auth()->guard()->check()): ?>
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" 
-                                   id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <?php if(Auth::user()->profile_photo_path): ?>
                                         <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo_path)); ?>" 
-                                             alt="Foto" class="rounded-circle me-2" 
-                                             style="width: 25px; height: 25px; object-fit: cover;">
+                                            alt="Foto" class="rounded-circle me-2" 
+                                            style="width: 25px; height: 25px; object-fit: cover;">
                                     <?php else: ?>
                                         <i class="fas fa-user-circle fa-lg me-2"></i>
                                     <?php endif; ?>
@@ -170,8 +237,8 @@
                                             <?php echo csrf_field(); ?>
                                         </form>
                                         <a class="dropdown-item" href="#" 
-                                           onclick="event.preventDefault(); document.getElementById('logout-form-customer').submit();">
-                                           Logout
+                                        onclick="event.preventDefault(); document.getElementById('logout-form-customer').submit();">
+                                        Logout
                                         </a>
                                     </li>
                                 </ul>
@@ -186,6 +253,159 @@
             </div>
         </nav>
     </section>
+
+    <style>
+    /* === ENHANCED VIBE NAVIGATION STYLES === */
+
+    /* Vibe nav link with sparkle icon */
+    .vibe-nav-link {
+        color: #ffc0cb !important;
+        font-weight: 600;
+        position: relative;
+    }
+
+    .vibe-nav-link:hover {
+        color: #ff8fab !important;
+    }
+
+    .vibe-nav-link::before {
+        background-color: #ffc0cb !important;
+    }
+
+    /* Enhanced vibe dropdown */
+    .vibe-dropdown {
+        min-width: 280px;
+        padding: 10px 0;
+        border: 1px solid #ffc0cb;
+        box-shadow: 0 10px 30px rgba(255, 192, 203, 0.2);
+        border-radius: 8px;
+    }
+
+    .vibe-dropdown .dropdown-header {
+        color: #333;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 8px 20px;
+    }
+
+    .vibe-dropdown-item {
+        padding: 12px 20px !important;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .vibe-dropdown-item:hover {
+        background: linear-gradient(135deg, rgba(255, 192, 203, 0.1) 0%, rgba(255, 139, 171, 0.1) 100%);
+        transform: translateX(5px);
+    }
+
+    .vibe-dropdown-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .vibe-dropdown-icon {
+        font-size: 1.4rem;
+        width: 30px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .vibe-dropdown-item:hover .vibe-dropdown-icon {
+        transform: scale(1.1);
+    }
+
+    /* Vibe icon colors */
+    .beach-color { color: #5DADE2; }
+    .elegant-color { color: #AF7AC5; }
+    .sporty-color { color: #F1948A; }
+    .casual-color { color: #A9DFBF; }
+
+    .vibe-dropdown-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .vibe-dropdown-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .vibe-dropdown-desc {
+        color: #666;
+        font-size: 0.8rem;
+        line-height: 1.2;
+    }
+
+    .browse-all-vibes {
+        color: #ffc0cb !important;
+        font-weight: 500;
+        text-align: center;
+        padding: 10px 20px !important;
+    }
+
+    .browse-all-vibes:hover {
+        background: rgba(255, 192, 203, 0.1);
+        color: #ff8fab !important;
+    }
+
+    /* Mobile responsiveness for vibe dropdown */
+    @media (max-width: 991.98px) {
+        .vibe-dropdown {
+            min-width: 250px;
+            position: static;
+            transform: none;
+            box-shadow: none;
+            border: none;
+            border-radius: 0;
+            background: #f8f9fa;
+            margin-top: 10px;
+        }
+        
+        .vibe-dropdown-item {
+            padding: 10px 15px !important;
+        }
+        
+        .vibe-dropdown-content {
+            gap: 10px;
+        }
+        
+        .vibe-dropdown-icon {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+    }
+
+    /* Quick access button for mobile */
+    @media (max-width: 575.98px) {
+        .vibe-nav-link {
+            font-size: 0.9rem;
+        }
+        
+        .vibe-dropdown-title {
+            font-size: 0.9rem;
+        }
+        
+        .vibe-dropdown-desc {
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Accessibility improvements */
+    .vibe-dropdown-item:focus {
+        outline: 2px solid #ffc0cb;
+        outline-offset: -2px;
+    }
+
+    .nav-link:focus {
+        outline: 2px solid #ffc0cb;
+        outline-offset: 2px;
+    }
+    </style>
 
     <!-- YOUR ORIGINAL MAIN CONTENT WRAPPER -->
     <main class="main-content">

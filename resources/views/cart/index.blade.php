@@ -164,6 +164,7 @@
     background: none;
     padding: 0;
     margin-bottom: 1rem;
+    margin-top: 1.5rem;
 }
 
 .breadcrumb-item a {

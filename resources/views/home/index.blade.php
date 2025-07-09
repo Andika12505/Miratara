@@ -1,3 +1,4 @@
+<!-- resources/views/home/index.blade.php -->
 @extends('layouts.main')
 
 @section('title', 'Home - MiraTara Fashion')
@@ -22,9 +23,9 @@
             <div class="carousel-item">
                 <div class="home-banner home-banner-2" style="background-image: url('{{ asset('images/miaw2.png') }}');">
                     <div class="home-banner-text">
-                        <h1>Miaw</h1>
-                        <h2>100% Discount For This All Day</h2>
-                        <a href="{{ route('products.index') }}" class="btn-carousel text-uppercase mt-4">Our Products</a>
+                        <img src="{{ asset('images/logo1.png') }}" alt="Logo" height="90" />
+                        <h2> ~70% Discount on all items today</h2>
+                        <a href="{{ route('products.index') }}" class="btn-carousel text-uppercase mt-4" style="margin-left: 20px">Our Products</a>
                     </div>
                 </div>
             </div>
@@ -40,13 +41,120 @@
     </div>
 </section>
 
+<!-- NEW: Discover Your Vibe Section -->
+<section id="vibe-discovery" class="vibe-discovery">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="vibe-header text-center mb-5">
+                    <h2 class="vibe-main-title">Discover Your Vibe</h2>
+                    <p class="vibe-subtitle">Find your perfect style in seconds. Each vibe is carefully curated to match your mood and occasion.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4" style="position: relative; z-index: 2;">
+            <!-- Beach Getaway Vibe -->
+            <div class="col-lg-6 col-md-12">
+                <div class="vibe-card vibe-beach" onclick="location.href='{{ route('products.index', ['vibe_name' => 'beach_getaway']) }}'">
+                    <div class="vibe-card-content">
+                        <div class="vibe-icon">
+                            <i class="fas fa-umbrella-beach"></i>
+                        </div>
+                        <h3 class="vibe-title">Beach Getaway</h3>
+                        <p class="vibe-description">Casual & breezy pieces perfect for vacation vibes. Think cotton, linen, and relaxed silhouettes.</p>
+                        <div class="vibe-tags">
+                            <span class="vibe-tag">Casual</span>
+                            <span class="vibe-tag">Bohemian</span>
+                            <span class="vibe-tag">Bright Colors</span>
+                        </div>
+                        <div class="vibe-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Elegant Evening Vibe -->
+            <div class="col-lg-6 col-md-12">
+                <div class="vibe-card vibe-elegant" onclick="location.href='{{ route('products.index', ['vibe_name' => 'elegant_evening']) }}'">
+                    <div class="vibe-card-content">
+                        <div class="vibe-icon">
+                            <i class="fas fa-cocktail"></i>
+                        </div>
+                        <h3 class="vibe-title">Elegant Evening</h3>
+                        <p class="vibe-description">Sophisticated pieces for special occasions. Luxurious fabrics and timeless silhouettes.</p>
+                        <div class="vibe-tags">
+                            <span class="vibe-tag">Elegant</span>
+                            <span class="vibe-tag">Glamour</span>
+                            <span class="vibe-tag">Dark Tones</span>
+                        </div>
+                        <div class="vibe-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sporty Active Vibe -->
+            <div class="col-lg-6 col-md-12">
+                <div class="vibe-card vibe-sporty" onclick="location.href='{{ route('products.index', ['vibe_name' => 'sporty_active']) }}'">
+                    <div class="vibe-card-content">
+                        <div class="vibe-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <h3 class="vibe-title">Sporty Active</h3>
+                        <p class="vibe-description">Performance-ready pieces that transition from gym to street. Comfort meets style.</p>
+                        <div class="vibe-tags">
+                            <span class="vibe-tag">Sporty</span>
+                            <span class="vibe-tag">Water-resistant</span>
+                            <span class="vibe-tag">Bright</span>
+                        </div>
+                        <div class="vibe-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Casual Vibe -->
+            <div class="col-lg-6 col-md-12">
+                <div class="vibe-card vibe-casual" onclick="location.href='{{ route('products.index', ['vibe_name' => 'daily_casual']) }}'">
+                    <div class="vibe-card-content">
+                        <div class="vibe-icon">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <h3 class="vibe-title">Daily Casual</h3>
+                        <p class="vibe-description">Effortless everyday essentials. Comfortable pieces that work from home to office.</p>
+                        <div class="vibe-tags">
+                            <span class="vibe-tag">Everyday</span>
+                            <span class="vibe-tag">Office</span>
+                            <span class="vibe-tag">Earthy</span>
+                        </div>
+                        <div class="vibe-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA to Products -->
+        <div class="row mt-5" style="position: relative; z-index: 2;">
+            <div class="col-12 text-center">
+                <p class="browse-all-text">Can't decide? <a href="{{ route('products.index') }}" class="browse-all-link">Browse all products</a> or use our advanced filters.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section id="products" class="products">
     <div class="container">
         <!-- Header Section -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="headline text-center mb-5">
-                    <h2 class="pb-3 position-relative d-inline-block">Our Products</h2>
+                    <h2 class="pb-3 position-relative d-inline-block">Featured Products</h2>
                 </div>
             </div>
         </div>
@@ -81,6 +189,236 @@
 .container {
     max-width: 1400px;
     margin: 0 auto;
+}
+
+/* === VIBE DISCOVERY SECTION === */
+.vibe-discovery {
+    padding: 40px 0;
+    background-image: url('{{ asset('images/miaw7.jpeg') }}');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.vibe-discovery::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 1;
+}
+
+.vibe-header {
+    position: relative;
+    z-index: 2;
+}
+
+.vibe-main-title {
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+}
+
+.vibe-main-title::before {
+    content: "";
+    width: 21%;
+    height: 0.125rem;
+    background-color: #ffc0cb;
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    border-radius: 0.635rem;
+}
+
+.vibe-main-title::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 40px;
+    background: radial-gradient(ellipse at center, rgba(255, 192, 203, 0.3) 0%, rgba(255, 192, 203, 0.1) 50%, transparent 70%);
+    z-index: -1;
+}
+
+.vibe-subtitle {
+    font-size: 1rem;
+    color: #fff;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.vibe-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 30px;
+    background: radial-gradient(ellipse at center, rgba(255, 192, 203, 0.2) 0%, rgba(255, 192, 203, 0.05) 60%, transparent 80%);
+    z-index: -1;
+}
+
+.vibe-card {
+    background: rgba(255,255,255,0.9);
+    border-radius: 4px;
+    padding: 30px 25px;
+    height: 240px;
+    width: 97%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 2px;
+    border: 1px solid #f0f0f0;
+    z-index: 2;
+}
+
+.vibe-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.vibe-beach::before {
+    background: linear-gradient(135deg, rgba(135, 206, 235, 0.15) 0%, rgba(32, 178, 170, 0.15) 100%);
+}
+
+.vibe-elegant::before {
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.15) 0%, rgba(142, 68, 173, 0.15) 100%);
+}
+
+.vibe-sporty::before {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(78, 205, 196, 0.15) 100%);
+}
+
+.vibe-casual::before {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(143, 188, 143, 0.15) 100%);
+}
+
+.vibe-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.18), 0 8px 16px rgba(0,0,0,0.08);
+    border-color: #ffc0cb;
+}
+
+.vibe-card:hover::before {
+    opacity: 1;
+}
+
+.vibe-card:hover .vibe-icon i {
+    transform: scale(1.1);
+}
+
+.vibe-card:hover .vibe-arrow {
+    transform: translateX(8px);
+    opacity: 1;
+}
+
+.vibe-card-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+}
+
+.vibe-icon {
+    margin-bottom: 20px;
+}
+
+.vibe-icon i {
+    font-size: 2.5rem;
+    transition: all 0.3s ease;
+}
+
+.vibe-beach .vibe-icon i { color: #5DADE2; }
+.vibe-elegant .vibe-icon i { color: #AF7AC5; }
+.vibe-sporty .vibe-icon i { color: #F1948A; }
+.vibe-casual .vibe-icon i { color: #A9DFBF; }
+
+.vibe-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    transition: none;
+}
+
+.vibe-description {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    transition: none;
+}
+
+.vibe-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.vibe-tag {
+    background: rgba(255, 192, 203, 0.2);
+    color: #666;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid rgba(255, 192, 203, 0.3);
+}
+
+.vibe-arrow {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.vibe-arrow i {
+    font-size: 1.2rem;
+    color: #ffc0cb;
+}
+
+.browse-all-text {
+    font-size: 1rem;
+    color: #fff;
+}
+
+.browse-all-link {
+    color: #ffc0cb;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.browse-all-link:hover {
+    color: #ff8fab;
+    text-decoration: underline;
 }
 
 /* === SHARED PRODUCT CARD STYLES === */
@@ -317,7 +655,7 @@
     color: #fff;
     font-size: 14px;
     padding: 8px 20px;
-    border-radius: 8px;
+    border-radius: 4px;
     text-decoration: none;
     transition: 0.3s;
 }
@@ -353,10 +691,62 @@ img{
     }
 }
 
+@media (max-width: 991px) {
+    .vibe-main-title {
+        font-size: 2rem;
+    }
+    
+    .vibe-card {
+        height: 240px;
+        padding: 25px 20px;
+    }
+    
+    .vibe-title {
+        font-size: 1.3rem;
+    }
+    
+    .vibe-description {
+        font-size: 0.85rem;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding-left: 15px;
         padding-right: 15px;
+    }
+    
+    .vibe-discovery {
+        padding: 50px 0;
+    }
+    
+    .vibe-main-title {
+        font-size: 1.8rem;
+    }
+    
+    .vibe-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .vibe-card {
+        height: auto;
+        min-height: 200px;
+        padding: 20px 18px;
+        margin-bottom: 20px;
+    }
+    
+    .vibe-title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+    
+    .vibe-description {
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+    }
+    
+    .vibe-icon i {
+        font-size: 2rem;
     }
     
     .product-info {
@@ -380,6 +770,37 @@ img{
     .col-sm-12 {
         padding: 0 10px;
         margin-bottom: 30px;
+    }
+    
+    .vibe-discovery {
+        padding: 40px 0;
+    }
+    
+    .vibe-main-title {
+        font-size: 1.5rem;
+    }
+    
+    .vibe-card {
+        padding: 18px 15px;
+        min-height: 180px;
+    }
+    
+    .vibe-icon i {
+        font-size: 1.8rem;
+    }
+    
+    .vibe-title {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    
+    .vibe-description {
+        font-size: 0.75rem;
+    }
+    
+    .vibe-tag {
+        font-size: 0.7rem;
+        padding: 3px 8px;
     }
     
     .home .home-banner .home-banner-text h1 {
