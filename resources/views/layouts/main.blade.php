@@ -196,6 +196,153 @@
     <!-- MODULAR CART OFFCANVAS COMPONENT -->
     @include('components.cart-offcanvas')
 
+    <script>
+    // === GLOBAL CART FUNCTIONS === 
+    // Available immediately on all pages
+
+    // Clear cart function
+    window.clearCartUniversal = async function(source = 'page') {
+        if (!confirm('Apakah Anda yakin ingin mengosongkan seluruh keranjang belanja?')) {
+            return;
+        }
+        
+        try {
+            console.log('Clearing cart from:', source);
+            
+            const response = await fetch('{{ route("cart.clear") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            console.log('Clear cart response:', data);
+            
+            if (data.success) {
+                if (typeof updateCartBadge === 'function') {
+                    updateCartBadge(0);
+                }
+                
+                if (typeof fetchCartContent === 'function') {
+                    fetchCartContent();
+                }
+                
+                if (typeof showCartToast === 'function') {
+                    showCartToast('Keranjang berhasil dikosongkan!', 'success');
+                } else {
+                    alert('Keranjang berhasil dikosongkan!');
+                }
+                
+                if (window.location.pathname.includes('/cart')) {
+                    setTimeout(() => location.reload(), 1000);
+                }
+                
+            } else {
+                throw new Error(data.message || 'Failed to clear cart');
+            }
+            
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            
+            if (typeof showCartToast === 'function') {
+                showCartToast('Gagal mengosongkan keranjang', 'error');
+            } else {
+                alert('Gagal mengosongkan keranjang');
+            }
+        }
+    };
+
+    // Update quantity function
+    window.updateQuantity = async function(rowId, newQuantity) {
+        if (newQuantity < 0) {
+            newQuantity = 0;
+        }
+        
+        const cartItem = document.querySelector(`[data-row-id="${rowId}"]`);
+        if (cartItem) cartItem.classList.add('loading');
+        
+        try {
+            const formData = new FormData();
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+            formData.append('quantity', newQuantity);
+            
+            const response = await fetch(`/cart/update/${rowId}`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (newQuantity === 0 || result.removed) {
+                        alert('Produk berhasil dihapus dari keranjang!');
+                    } else {
+                        alert('Jumlah produk berhasil diupdate!');
+                    }
+                    location.reload();
+                } else {
+                    throw new Error(result.message || 'Failed to update quantity');
+                }
+            } else {
+                throw new Error('Failed to update quantity');
+            }
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            alert('Gagal mengupdate jumlah produk. Silakan coba lagi.');
+        }
+        
+        if (cartItem) cartItem.classList.remove('loading');
+    };
+
+    // Remove item function
+    window.removeItem = async function(rowId, productName) {
+        if (!confirm(`Apakah Anda yakin ingin menghapus "${productName}" dari keranjang?`)) {
+            return;
+        }
+        
+        const cartItem = document.querySelector(`[data-row-id="${rowId}"]`);
+        if (cartItem) cartItem.classList.add('loading');
+        
+        try {
+            const response = await fetch(`/cart/remove/${rowId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Produk berhasil dihapus dari keranjang!');
+                    location.reload();
+                } else {
+                    throw new Error(result.message || 'Failed to remove item');
+                }
+            } else {
+                throw new Error('Failed to remove item');
+            }
+        } catch (error) {
+            console.error('Error removing item:', error);
+            alert('Gagal menghapus produk. Silakan coba lagi.');
+        }
+        
+        if (cartItem) cartItem.classList.remove('loading');
+    };
+
+    // Alias for backward compatibility
+    window.clearCart = function() {
+        return window.clearCartUniversal('cart-page');
+    };
+    </script>
+
     @stack('scripts')
 </body>
 </html>

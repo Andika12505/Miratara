@@ -169,25 +169,44 @@ class CartController extends Controller
     }
 
     // Mengosongkan cart
-    public function clear(Request $request = null)
+    public function clear(Request $request)  // Remove = null, make it required
     {
         try {
+            \Log::info('Clear cart method called');
+            \Log::info('Request method: ' . $request->method());
+            \Log::info('Is AJAX: ' . ($request->ajax() ? 'YES' : 'NO'));
+            \Log::info('Request headers: ' . json_encode($request->headers->all()));
+            
+            // Clear the cart
             Cart::destroy();
             
-            if ($request && ($request->expectsJson() || $request->ajax())) {
+            \Log::info('Cart destroyed. Count: ' . Cart::count());
+            
+            // Check if it's a POST request (which means it's from JavaScript)
+            if ($request->isMethod('POST')) {
+                \Log::info('Returning JSON response');
+                
                 return response()->json([
                     'success' => true,
                     'message' => 'Keranjang berhasil dikosongkan!',
-                    'cartCount' => 0,
-                    'cartTotal' => 0
+                    'cartCount' => Cart::count(),
+                    'cartTotal' => Cart::total()
                 ]);
             }
             
+            \Log::info('Returning redirect response');
             return redirect()->route('cart.index')->with('success', 'Keranjang berhasil dikosongkan!');
+            
         } catch (\Exception $e) {
-            if ($request && ($request->expectsJson() || $request->ajax())) {
-                return response()->json(['success' => false, 'message' => 'Gagal mengosongkan keranjang'], 500);
+            \Log::error('Clear cart error: ' . $e->getMessage());
+            
+            if ($request->isMethod('POST')) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Error: ' . $e->getMessage()
+                ], 500);
             }
+            
             return redirect()->back()->with('error', 'Gagal mengosongkan keranjang');
         }
     }

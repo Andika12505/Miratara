@@ -243,31 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // CLEAR CART
-    const clearCart = async () => {
-        try {
-            const response = await fetch('<?php echo e(route("cart.clear")); ?>', {
-                method: 'POST', // Using POST instead of DELETE
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                updateCartBadge(0);
-                fetchCartContent(); // Reload cart content
-                showCartToast('Keranjang berhasil dikosongkan!', 'success');
-            } else {
-                throw new Error(data.message || 'Failed to clear cart');
-            }
-        } catch (error) {
-            console.error('Error clearing cart:', error);
-            showCartToast('Gagal mengosongkan keranjang', 'error');
-        }
+    // Replace the old clearCart function with:
+    const clearCart = () => {
+        window.clearCartUniversal('offcanvas');
     };
 
     // Helper functions

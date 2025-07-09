@@ -446,126 +446,14 @@
 <?php $__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Update quantity function
-    window.updateQuantity = async function(rowId, newQuantity) {
-        // Allow quantity to be 0 (which will remove the item)
-        if (newQuantity < 0) {
-            newQuantity = 0;
-        }
-        
-        const cartItem = document.querySelector(`[data-row-id="${rowId}"]`);
-        cartItem.classList.add('loading');
-        
-        try {
-            const formData = new FormData();
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-            formData.append('quantity', newQuantity);
-            
-            // Use proper Laravel route with parameter
-            const response = await fetch(`/cart/update/${rowId}`, {
-                method: 'POST',
-                body: formData
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Show success message
-                    if (newQuantity === 0 || result.removed) {
-                        alert('Produk berhasil dihapus dari keranjang!');
-                    } else {
-                        alert('Jumlah produk berhasil diupdate!');
-                    }
-                    
-                    // Reload to update the view
-                    location.reload();
-                } else {
-                    throw new Error(result.message || 'Failed to update quantity');
-                }
-            } else {
-                throw new Error('Failed to update quantity');
-            }
-        } catch (error) {
-            console.error('Error updating quantity:', error);
-            alert('Gagal mengupdate jumlah produk. Silakan coba lagi.');
-        }
-        
-        cartItem.classList.remove('loading');
-    };
-
-    // Remove item function
-    window.removeItem = async function(rowId, productName) {
-        if (!confirm(`Apakah Anda yakin ingin menghapus "${productName}" dari keranjang?`)) {
-            return;
-        }
-        
-        const cartItem = document.querySelector(`[data-row-id="${rowId}"]`);
-        cartItem.classList.add('loading');
-        
-        try {
-            const response = await fetch(`/cart/remove/${rowId}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('Produk berhasil dihapus dari keranjang!');
-                    location.reload();
-                } else {
-                    throw new Error(result.message || 'Failed to remove item');
-                }
-            } else {
-                throw new Error('Failed to remove item');
-            }
-        } catch (error) {
-            console.error('Error removing item:', error);
-            alert('Gagal menghapus produk. Silakan coba lagi.');
-        }
-        
-        cartItem.classList.remove('loading');
-    };
-
-    // Clear cart function
-    window.clearCart = async function() {
-        if (!confirm('Apakah Anda yakin ingin mengosongkan seluruh keranjang belanja?')) {
-            return;
-        }
-        
-        try {
-            const response = await fetch('/cart/clear', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('Keranjang berhasil dikosongkan!');
-                    location.reload();
-                } else {
-                    throw new Error(result.message || 'Failed to clear cart');
-                }
-            } else {
-                throw new Error('Failed to clear cart');
-            }
-        } catch (error) {
-            console.error('Error clearing cart:', error);
-            alert('Gagal mengosongkan keranjang. Silakan coba lagi.');
-        }
-    };
+    console.log('Cart page loaded - all functions should be available');
+    
+    // Test functions are available
+    console.log('Functions check:', {
+        clearCart: typeof window.clearCart,
+        updateQuantity: typeof window.updateQuantity,
+        removeItem: typeof window.removeItem
+    });
 });
 </script>
 <?php $__env->stopPush(); ?>
