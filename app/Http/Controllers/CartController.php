@@ -8,13 +8,18 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 
 class CartController extends Controller
 {
-    // Menampilkan halaman cart
+    /**
+     * Display the cart page
+     */
     public function index()
     {
         $cartItems = Cart::content();
         return view('cart.index', compact('cartItems'));
     }
-    // NEW: API endpoint untuk offcanvas - returns JSON data
+
+    /**
+     * Get cart data as JSON for API endpoints
+     */
     public function getCartData()
     {
         $cartItems = Cart::content();
@@ -32,11 +37,9 @@ class CartController extends Controller
         ]);
     }
 
-    // NEW: API endpoint to get cart offcanvas HTML
-    // Replace your getCartOffcanvasContent() method in CartController.php with this:
-
-    // Replace your getCartOffcanvasContent() method with this working version:
-
+    /**
+     * Get cart offcanvas HTML content
+     */
     public function getCartOffcanvasContent()
     {
         try {
@@ -44,7 +47,6 @@ class CartController extends Controller
             $cartCount = Cart::count();
             $cartTotal = Cart::total();
             
-            // Since we know the data exists, let's render the view properly
             return view('components.cart-offcanvas-content', compact('cartItems', 'cartCount', 'cartTotal'))->render();
             
         } catch (\Exception $e) {
@@ -58,144 +60,117 @@ class CartController extends Controller
         }
     }
 
-    // UPDATED: Menambah item ke cart - now supports JSON response
+    /**
+     * Add item to cart
+     */
     public function add(Request $request)
     {
         try {
             $product = Product::findOrFail($request->id);
             
+            // Validate and prepare cart data
+            $validatedData = $this->validateCartAddition($request, $product);
+            $cartData = $this->prepareCartData($product, $validatedData);
+            
+            // Add to cart
             Cart::add(
-                $product->id,
+                $cartData['id'],
                 $product->name,
-                $request->quantity ?? 1,
+                $cartData['quantity'],
                 $product->price,
-                ['image' => $product->image] // Opsi tambahan seperti gambar
+                $cartData['options']
             );
 
-            // If request expects JSON (for AJAX), return JSON
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Produk berhasil ditambahkan ke keranjang!',
-                    'cartCount' => Cart::count(),
-                    'cartTotal' => Cart::total()
-                ]);
-            }
+            $successMessage = $this->buildSuccessMessage($product, $cartData);
 
-            // Otherwise, return redirect (for regular form submission)
-            return redirect()->route('cart.index')->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+            return $this->handleResponse($request, [
+                'success' => true,
+                'message' => $successMessage,
+                'cartCount' => Cart::count(),
+                'cartTotal' => Cart::total(),
+                'sizeInfo' => $cartData['sizeInfo'] ?? null
+            ]);
             
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->handleValidationError($request, $e);
         } catch (\Exception $e) {
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Gagal menambahkan produk ke keranjang'
-                ], 500);
-            }
-            
-            return redirect()->back()->with('error', 'Gagal menambahkan produk ke keranjang');
+            return $this->handleError($request, $e->getMessage());
         }
     }
 
-    // Update kuantitas item
+    /**
+     * Update cart item quantity
+     */
     public function update(Request $request, $rowId)
     {
         try {
             $quantity = (int) $request->quantity;
             
-            // If quantity is 0 or less, remove the item instead of updating
             if ($quantity <= 0) {
                 Cart::remove($rowId);
-                $message = 'Produk berhasil dihapus dari keranjang!';
+                $message = 'Product removed from cart successfully!';
+                $removed = true;
             } else {
                 Cart::update($rowId, $quantity);
-                $message = 'Keranjang berhasil diupdate!';
+                $message = 'Cart updated successfully!';
+                $removed = false;
             }
             
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                    'cartCount' => Cart::count(),
-                    'cartTotal' => Cart::total(),
-                    'removed' => $quantity <= 0
-                ]);
-            }
-            
-            return redirect()->route('cart.index')->with('success', $message);
+            return $this->handleResponse($request, [
+                'success' => true,
+                'message' => $message,
+                'cartCount' => Cart::count(),
+                'cartTotal' => Cart::total(),
+                'removed' => $removed
+            ]);
             
         } catch (\Exception $e) {
             \Log::error('Cart update error: ' . $e->getMessage());
-            
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Gagal mengupdate keranjang'
-                ], 500);
-            }
-            
-            return redirect()->back()->with('error', 'Gagal mengupdate keranjang');
+            return $this->handleError($request, 'Failed to update cart');
         }
     }
-    // Menghapus item dari cart
+
+    /**
+     * Remove item from cart
+     */
     public function remove(Request $request, $rowId)
     {
         try {
             Cart::remove($rowId);
             
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Produk berhasil dihapus dari keranjang!',
-                    'cartCount' => Cart::count(),
-                    'cartTotal' => Cart::total()
-                ]);
-            }
-            
-            return redirect()->route('cart.index')->with('success', 'Produk berhasil dihapus dari keranjang!');
+            return $this->handleResponse($request, [
+                'success' => true,
+                'message' => 'Product removed from cart successfully!',
+                'cartCount' => Cart::count(),
+                'cartTotal' => Cart::total()
+            ]);
             
         } catch (\Exception $e) {
             \Log::error('Cart remove error: ' . $e->getMessage());
-            
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Gagal menghapus produk dari keranjang'
-                ], 500);
-            }
-            
-            return redirect()->back()->with('error', 'Gagal menghapus produk dari keranjang');
+            return $this->handleError($request, 'Failed to remove product from cart');
         }
     }
 
-    // Mengosongkan cart
-    public function clear(Request $request)  // Remove = null, make it required
+    /**
+     * Clear entire cart
+     */
+    public function clear(Request $request)
     {
         try {
             \Log::info('Clear cart method called');
-            \Log::info('Request method: ' . $request->method());
-            \Log::info('Is AJAX: ' . ($request->ajax() ? 'YES' : 'NO'));
-            \Log::info('Request headers: ' . json_encode($request->headers->all()));
-            
-            // Clear the cart
             Cart::destroy();
+            \Log::info('Cart cleared successfully. Count: ' . Cart::count());
             
-            \Log::info('Cart destroyed. Count: ' . Cart::count());
-            
-            // Check if it's a POST request (which means it's from JavaScript)
             if ($request->isMethod('POST')) {
-                \Log::info('Returning JSON response');
-                
                 return response()->json([
                     'success' => true,
-                    'message' => 'Keranjang berhasil dikosongkan!',
+                    'message' => 'Cart cleared successfully!',
                     'cartCount' => Cart::count(),
                     'cartTotal' => Cart::total()
                 ]);
             }
             
-            \Log::info('Returning redirect response');
-            return redirect()->route('cart.index')->with('success', 'Keranjang berhasil dikosongkan!');
+            return redirect()->route('cart.index')->with('success', 'Cart cleared successfully!');
             
         } catch (\Exception $e) {
             \Log::error('Clear cart error: ' . $e->getMessage());
@@ -207,7 +182,158 @@ class CartController extends Controller
                 ], 500);
             }
             
-            return redirect()->back()->with('error', 'Gagal mengosongkan keranjang');
+            return redirect()->back()->with('error', 'Failed to clear cart');
         }
+    }
+
+    /**
+     * Validate cart addition request
+     */
+    private function validateCartAddition(Request $request, Product $product)
+    {
+        $rules = [
+            'id' => 'required|exists:products,id',
+            'quantity' => 'nullable|integer|min:1|max:99'
+        ];
+        
+        $messages = [
+            'id.required' => 'Product ID is required.',
+            'id.exists' => 'Product not found.',
+            'quantity.integer' => 'Quantity must be a valid number.',
+            'quantity.min' => 'Quantity must be at least 1.',
+            'quantity.max' => 'Maximum quantity per addition is 99.'
+        ];
+        
+        // Add size validation if product has sizes
+        if ($product->hasSizes()) {
+            $rules['size_id'] = [
+                'required',
+                'exists:sizes,id',
+                function ($attribute, $value, $fail) use ($product) {
+                    $sizeExists = $product->sizes()
+                        ->where('size_id', $value)
+                        ->where('product_sizes.is_available', true)
+                        ->where('product_sizes.stock', '>', 0)
+                        ->exists();
+                    
+                    if (!$sizeExists) {
+                        $fail('The selected size is not available for this product.');
+                    }
+                }
+            ];
+            
+            $messages = array_merge($messages, [
+                'size_id.required' => 'Please select a size for this product.',
+                'size_id.exists' => 'Selected size is not valid.'
+            ]);
+        }
+        
+        return $request->validate($rules, $messages);
+    }
+
+    /**
+     * Prepare cart data for addition
+     */
+    private function prepareCartData(Product $product, array $validatedData)
+    {
+        $quantity = $validatedData['quantity'] ?? 1;
+        
+        if ($product->hasSizes() && isset($validatedData['size_id'])) {
+            $selectedSize = $product->sizes()->where('size_id', $validatedData['size_id'])->first();
+            
+            // Validate stock for selected size
+            if (!$selectedSize || !$selectedSize->pivot->is_available || $selectedSize->pivot->stock <= 0) {
+                throw new \Exception('Selected size is currently out of stock.');
+            }
+            
+            if ($quantity > $selectedSize->pivot->stock) {
+                throw new \Exception("Only {$selectedSize->pivot->stock} items available in size {$selectedSize->name}.");
+            }
+            
+            return [
+                'id' => $product->id . '_size_' . $selectedSize->id,
+                'quantity' => $quantity,
+                'options' => [
+                    'image' => $product->image,
+                    'size_id' => $selectedSize->id,
+                    'size_name' => $selectedSize->name,
+                    'size_display' => $selectedSize->display,
+                    'has_size' => true
+                ],
+                'sizeInfo' => [
+                    'size_id' => $selectedSize->id,
+                    'size_name' => $selectedSize->name,
+                    'size_display' => $selectedSize->display
+                ]
+            ];
+        } else {
+            // Product without sizes
+            if ($quantity > $product->stock) {
+                throw new \Exception("Only {$product->stock} items available.");
+            }
+            
+            return [
+                'id' => $product->id,
+                'quantity' => $quantity,
+                'options' => [
+                    'image' => $product->image,
+                    'has_size' => false
+                ]
+            ];
+        }
+    }
+
+    /**
+     * Build success message for cart addition
+     */
+    private function buildSuccessMessage(Product $product, array $cartData)
+    {
+        $sizeText = isset($cartData['sizeInfo']) ? " (Size: {$cartData['sizeInfo']['size_name']})" : "";
+        return "Product{$sizeText} added to cart successfully!";
+    }
+
+    /**
+     * Handle response based on request type (AJAX or regular)
+     */
+    private function handleResponse(Request $request, array $data)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json($data);
+        }
+        
+        $message = $data['message'];
+        $status = $data['success'] ? 'success' : 'error';
+        
+        return redirect()->route('cart.index')->with($status, $message);
+    }
+
+    /**
+     * Handle validation errors
+     */
+    private function handleValidationError(Request $request, \Illuminate\Validation\ValidationException $e)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first()
+            ], 422);
+        }
+        
+        return redirect()->back()->withErrors($e->validator)->withInput();
+    }
+
+    /**
+     * Handle general errors
+     */
+    private function handleError(Request $request, string $message)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message
+            ], 500);
+        }
+        
+        return redirect()->back()->with('error', $message);
     }
 }

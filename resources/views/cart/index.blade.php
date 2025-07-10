@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Keranjang Belanja - MiraTara Fashion')
+@section('title', 'Shopping Cart - MiraTara Fashion')
 
 @section('content')
 <div class="container my-5">
@@ -10,10 +10,10 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('homepage') }}">Home</a></li>
-                    <li class="breadcrumb-item active">Keranjang Belanja</li>
+                    <li class="breadcrumb-item active">Shopping Cart</li>
                 </ol>
             </nav>
-            <h2 class="page-title">Keranjang Belanja Anda</h2>
+            <h2 class="page-title">Your Shopping Cart</h2>
         </div>
     </div>
 
@@ -21,6 +21,13 @@
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     @endif
@@ -37,14 +44,56 @@
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
                                 <div class="product-image-wrapper">
-                                    {{-- Adjust image path to match your system --}}
-                                    <img src="{{ $item->options->image ? asset('images/' . $item->options->image) : 'https://via.placeholder.com/100x100/f8f9fa/6c757d?text=No+Image' }}" 
+                                    @php
+                                        // DEBUG: Let's see what we have
+                                        $imageUrl = 'https://via.placeholder.com/100x100/f8f9fa/6c757d?text=No+Image';
+                                        
+                                        // Try different ways to access the image
+                                        if (isset($item->options['image']) && !empty($item->options['image'])) {
+                                            $imageUrl = asset('images/' . $item->options['image']);
+                                        } elseif (isset($item->options->image) && !empty($item->options->image)) {
+                                            $imageUrl = asset('images/' . $item->options->image);
+                                        }
+                                        
+                                        // Debug output - remove this after testing
+                                        // dd('Item options:', $item->options, 'Image URL:', $imageUrl);
+                                    @endphp
+                                    <img src="{{ $imageUrl }}" 
                                          alt="{{ $item->name }}" 
                                          class="cart-product-image"
                                          onerror="this.src='https://via.placeholder.com/100x100/f8f9fa/6c757d?text=No+Image'">
                                 </div>
                                 <div class="product-details">
                                     <h5 class="product-name">{{ $item->name }}</h5>
+                                    
+                                    {{-- Size Information - Try multiple ways to access --}}
+                                    @php
+                                        $hasSize = false;
+                                        $sizeName = '';
+                                        $sizeDisplay = '';
+                                        
+                                        // Try array access first
+                                        if (isset($item->options['has_size']) && $item->options['has_size'] && isset($item->options['size_name'])) {
+                                            $hasSize = true;
+                                            $sizeName = $item->options['size_name'];
+                                            $sizeDisplay = $item->options['size_display'] ?? $item->options['size_name'];
+                                        }
+                                        // Try object access as fallback
+                                        elseif (isset($item->options->has_size) && $item->options->has_size && isset($item->options->size_name)) {
+                                            $hasSize = true;
+                                            $sizeName = $item->options->size_name;
+                                            $sizeDisplay = $item->options->size_display ?? $item->options->size_name;
+                                        }
+                                    @endphp
+                                    
+                                    @if($hasSize)
+                                        <p class="product-size">
+                                            <small class="text-muted">
+                                                Size: <span class="badge bg-light text-dark border">{{ $sizeDisplay }}</span>
+                                            </small>
+                                        </p>
+                                    @endif
+                                    
                                     <p class="product-price">Rp {{ number_format($item->price, 0, ',', '.') }}</p>
                                 </div>
                             </div>
@@ -53,7 +102,7 @@
                         <!-- Quantity Controls -->
                         <div class="col-md-3">
                             <div class="quantity-controls">
-                                <label class="form-label small text-muted">Kuantitas</label>
+                                <label class="form-label small text-muted">Quantity</label>
                                 <div class="input-group">
                                     <button class="btn btn-outline-secondary btn-sm qty-btn" type="button" 
                                             onclick="updateQuantity('{{ $item->rowId }}', {{ $item->qty - 1 }})">
@@ -79,7 +128,7 @@
                                 </div>
                                 <button class="btn btn-outline-danger btn-sm remove-btn" 
                                         onclick="removeItem('{{ $item->rowId }}', '{{ $item->name }}')"
-                                        title="Hapus item">
+                                        title="Remove item">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -94,7 +143,7 @@
         <div class="col-lg-4">
             <div class="cart-summary">
                 <div class="summary-card">
-                    <h5 class="summary-title">Ringkasan Belanja</h5>
+                    <h5 class="summary-title">Order Summary</h5>
                     
                     <div class="summary-details">
                         <div class="summary-row">
@@ -102,7 +151,7 @@
                             <span>Rp {{ Cart::subtotal(0, ',', '.') }}</span>
                         </div>
                         <div class="summary-row">
-                            <span>Pajak</span>
+                            <span>Tax</span>
                             <span>Rp {{ Cart::tax(0, ',', '.') }}</span>
                         </div>
                         <hr class="summary-divider">
@@ -114,15 +163,15 @@
 
                     <div class="summary-actions">
                         <a href="{{ route('checkout_page') }}" class="btn btn-primary btn-lg w-100 mb-3">
-                            <i class="fas fa-credit-card me-2"></i>Lanjut ke Checkout
+                            <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
                         </a>
                         
                         <button class="btn btn-outline-danger w-100 mb-3" onclick="clearCart()">
-                            <i class="fas fa-trash me-2"></i>Kosongkan Keranjang
+                            <i class="fas fa-trash me-2"></i>Clear Cart
                         </button>
                         
                         <a href="{{ route('products.index') }}" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-arrow-left me-2"></i>Lanjut Belanja
+                            <i class="fas fa-arrow-left me-2"></i>Continue Shopping
                         </a>
                     </div>
                 </div>
@@ -136,13 +185,13 @@
             <div class="empty-cart-icon">
                 <i class="fas fa-shopping-cart"></i>
             </div>
-            <h4 class="empty-cart-title">Keranjang Belanja Kosong</h4>
+            <h4 class="empty-cart-title">Your Shopping Cart is Empty</h4>
             <p class="empty-cart-description">
-                Anda belum menambahkan produk apapun ke keranjang belanja. 
-                Mari mulai berbelanja dan temukan produk favorit Anda!
+                You haven't added any products to your cart yet. 
+                Start shopping and discover your favorite products!
             </p>
             <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-shopping-bag me-2"></i>Mulai Belanja
+                <i class="fas fa-shopping-bag me-2"></i>Start Shopping
             </a>
         </div>
     </div>
@@ -224,6 +273,10 @@
     color: #333;
     margin-bottom: 0.5rem;
     line-height: 1.4;
+}
+
+.product-size {
+    margin-bottom: 0.5rem;
 }
 
 .product-price {
@@ -405,6 +458,33 @@
     color: white;
 }
 
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .cart-item-card {
@@ -436,22 +516,16 @@
         font-size: 1.5rem;
     }
 }
-
-/* Loading states */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
 </style>
 @endpush
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Cart page loaded - all functions should be available');
+    console.log('Cart page loaded successfully');
     
-    // Test functions are available
-    console.log('Functions check:', {
+    // Verify global functions are available
+    console.log('Cart functions check:', {
         clearCart: typeof window.clearCart,
         updateQuantity: typeof window.updateQuantity,
         removeItem: typeof window.removeItem

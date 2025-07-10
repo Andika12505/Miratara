@@ -49,10 +49,35 @@ class Size extends Model
     }
 
     /**
-     * Get the display name or fall back to name
+     * Get the display name or fall back to name (enhanced for cart)
      */
     public function getDisplayAttribute()
     {
         return $this->display_name ?: $this->name;
+    }
+
+    /**
+     * Get size information formatted for cart display
+     */
+    public function getCartDisplayAttribute()
+    {
+        if ($this->display_name) {
+            return $this->display_name;
+        }
+        return $this->name;
+    }
+
+    /**
+     * Get size information with stock for cart
+     */
+    public function getCartInfoAttribute()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'display_name' => $this->display_name,
+            'display' => $this->getDisplayAttribute(),
+            'cart_display' => $this->getCartDisplayAttribute()
+        ];
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,10 +12,9 @@
     @stack('styles')
     
     <style>
-        /* YOUR ORIGINAL STYLES - Keep these */
         /* Main content offset for fixed navbar */
         body {
-            padding-top: 22px; /* Adjust this value based on your navbar height */
+            padding-top: 22px;
         }
         
         /* Navbar styling */
@@ -48,7 +47,7 @@
             }
         }
 
-        /* ADDITIONAL STYLES for cart functionality */
+        /* Navigation styling */
         .navbar .nav-login-button {
             border: 1px solid #ffc0cb;
             border-radius: 5px;
@@ -81,6 +80,153 @@
         .nav-link {
             position: relative;
         }
+
+        /* Vibe navigation styles */
+        .vibe-nav-link {
+            color: #ffc0cb !important;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .vibe-nav-link:hover {
+            color: #ff8fab !important;
+        }
+
+        .vibe-nav-link::before {
+            background-color: #ffc0cb !important;
+        }
+
+        .vibe-dropdown {
+            min-width: 280px;
+            padding: 10px 0;
+            border: 1px solid #ffc0cb;
+            box-shadow: 0 10px 30px rgba(255, 192, 203, 0.2);
+            border-radius: 8px;
+        }
+
+        .vibe-dropdown .dropdown-header {
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 8px 20px;
+        }
+
+        .vibe-dropdown-item {
+            padding: 12px 20px !important;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .vibe-dropdown-item:hover {
+            background: linear-gradient(135deg, rgba(255, 192, 203, 0.1) 0%, rgba(255, 139, 171, 0.1) 100%);
+            transform: translateX(5px);
+        }
+
+        .vibe-dropdown-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vibe-dropdown-icon {
+            font-size: 1.4rem;
+            width: 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .vibe-dropdown-item:hover .vibe-dropdown-icon {
+            transform: scale(1.1);
+        }
+
+        /* Vibe icon colors */
+        .beach-color { color: #5DADE2; }
+        .elegant-color { color: #AF7AC5; }
+        .sporty-color { color: #F1948A; }
+        .casual-color { color: #A9DFBF; }
+
+        .vibe-dropdown-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .vibe-dropdown-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .vibe-dropdown-desc {
+            color: #666;
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+
+        .browse-all-vibes {
+            color: #ffc0cb !important;
+            font-weight: 500;
+            text-align: center;
+            padding: 10px 20px !important;
+        }
+
+        .browse-all-vibes:hover {
+            background: rgba(255, 192, 203, 0.1);
+            color: #ff8fab !important;
+        }
+
+        /* Responsive design */
+        @media (max-width: 991.98px) {
+            .vibe-dropdown {
+                min-width: 250px;
+                position: static;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                background: #f8f9fa;
+                margin-top: 10px;
+            }
+            
+            .vibe-dropdown-item {
+                padding: 10px 15px !important;
+            }
+            
+            .vibe-dropdown-content {
+                gap: 10px;
+            }
+            
+            .vibe-dropdown-icon {
+                font-size: 1.2rem;
+                width: 25px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .vibe-nav-link {
+                font-size: 0.9rem;
+            }
+            
+            .vibe-dropdown-title {
+                font-size: 0.9rem;
+            }
+            
+            .vibe-dropdown-desc {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Accessibility */
+        .vibe-dropdown-item:focus {
+            outline: 2px solid #ffc0cb;
+            outline-offset: -2px;
+        }
+
+        .nav-link:focus {
+            outline: 2px solid #ffc0cb;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
@@ -106,7 +252,7 @@
                             aria-current="page" href="{{ route('homepage') }}">Home</a>
                         </li>
                         
-                        <!-- NEW: Find Your Vibe Dropdown -->
+                        <!-- Find Your Vibe Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle mx-lg-2 vibe-nav-link" href="#" role="button" 
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -203,7 +349,7 @@
                         <ul class="navbar-nav">
                             <li class="nav-item">
                                 <a class="nav-link mx-lg-2" data-bs-toggle="offcanvas" href="#cartOffcanvas" 
-                                role="button" aria-controls="cartOffcanvas" title="Keranjang Belanja">
+                                role="button" aria-controls="cartOffcanvas" title="Shopping Cart">
                                     <i class="fas fa-shopping-cart"></i>
                                     <span class="badge rounded-pill bg-danger cart-count">
                                         {{ Cart::count() > 0 ? Cart::count() : '' }}
@@ -220,7 +366,7 @@
                                 id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     @if (Auth::user()->profile_photo_path)
                                         <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" 
-                                            alt="Foto" class="rounded-circle me-2" 
+                                            alt="Profile" class="rounded-circle me-2" 
                                             style="width: 25px; height: 25px; object-fit: cover;">
                                     @else
                                         <i class="fas fa-user-circle fa-lg me-2"></i>
@@ -228,7 +374,7 @@
                                     {{ Auth::user()->username ?? Auth::user()->name }}
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
-                                    <li><a class="dropdown-item" href="{{ route('customer.account.view') }}">Lihat Akun</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('customer.account.view') }}">My Account</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form id="logout-form-customer" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -252,177 +398,23 @@
         </nav>
     </section>
 
-    <style>
-    /* === ENHANCED VIBE NAVIGATION STYLES === */
-
-    /* Vibe nav link with sparkle icon */
-    .vibe-nav-link {
-        color: #ffc0cb !important;
-        font-weight: 600;
-        position: relative;
-    }
-
-    .vibe-nav-link:hover {
-        color: #ff8fab !important;
-    }
-
-    .vibe-nav-link::before {
-        background-color: #ffc0cb !important;
-    }
-
-    /* Enhanced vibe dropdown */
-    .vibe-dropdown {
-        min-width: 280px;
-        padding: 10px 0;
-        border: 1px solid #ffc0cb;
-        box-shadow: 0 10px 30px rgba(255, 192, 203, 0.2);
-        border-radius: 8px;
-    }
-
-    .vibe-dropdown .dropdown-header {
-        color: #333;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-align: center;
-        padding: 8px 20px;
-    }
-
-    .vibe-dropdown-item {
-        padding: 12px 20px !important;
-        border: none;
-        transition: all 0.3s ease;
-    }
-
-    .vibe-dropdown-item:hover {
-        background: linear-gradient(135deg, rgba(255, 192, 203, 0.1) 0%, rgba(255, 139, 171, 0.1) 100%);
-        transform: translateX(5px);
-    }
-
-    .vibe-dropdown-content {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .vibe-dropdown-icon {
-        font-size: 1.4rem;
-        width: 30px;
-        text-align: center;
-        transition: transform 0.3s ease;
-    }
-
-    .vibe-dropdown-item:hover .vibe-dropdown-icon {
-        transform: scale(1.1);
-    }
-
-    /* Vibe icon colors */
-    .beach-color { color: #5DADE2; }
-    .elegant-color { color: #AF7AC5; }
-    .sporty-color { color: #F1948A; }
-    .casual-color { color: #A9DFBF; }
-
-    .vibe-dropdown-text {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .vibe-dropdown-title {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    .vibe-dropdown-desc {
-        color: #666;
-        font-size: 0.8rem;
-        line-height: 1.2;
-    }
-
-    .browse-all-vibes {
-        color: #ffc0cb !important;
-        font-weight: 500;
-        text-align: center;
-        padding: 10px 20px !important;
-    }
-
-    .browse-all-vibes:hover {
-        background: rgba(255, 192, 203, 0.1);
-        color: #ff8fab !important;
-    }
-
-    /* Mobile responsiveness for vibe dropdown */
-    @media (max-width: 991.98px) {
-        .vibe-dropdown {
-            min-width: 250px;
-            position: static;
-            transform: none;
-            box-shadow: none;
-            border: none;
-            border-radius: 0;
-            background: #f8f9fa;
-            margin-top: 10px;
-        }
-        
-        .vibe-dropdown-item {
-            padding: 10px 15px !important;
-        }
-        
-        .vibe-dropdown-content {
-            gap: 10px;
-        }
-        
-        .vibe-dropdown-icon {
-            font-size: 1.2rem;
-            width: 25px;
-        }
-    }
-
-    /* Quick access button for mobile */
-    @media (max-width: 575.98px) {
-        .vibe-nav-link {
-            font-size: 0.9rem;
-        }
-        
-        .vibe-dropdown-title {
-            font-size: 0.9rem;
-        }
-        
-        .vibe-dropdown-desc {
-            font-size: 0.75rem;
-        }
-    }
-
-    /* Accessibility improvements */
-    .vibe-dropdown-item:focus {
-        outline: 2px solid #ffc0cb;
-        outline-offset: -2px;
-    }
-
-    .nav-link:focus {
-        outline: 2px solid #ffc0cb;
-        outline-offset: 2px;
-    }
-    </style>
-
-    <!-- YOUR ORIGINAL MAIN CONTENT WRAPPER -->
+    <!-- Main Content -->
     <main class="main-content">
         @yield('content')
     </main>
 
-    <!-- YOUR ORIGINAL FOOTER -->
+    <!-- Footer -->
     @include('components.footer')
 
-    <!-- MODULAR CART OFFCANVAS COMPONENT -->
+    <!-- Cart Offcanvas Component -->
     @include('components.cart-offcanvas')
 
     <script>
-    // === GLOBAL CART FUNCTIONS === 
-    // Available immediately on all pages
-
+    // === GLOBAL CART FUNCTIONS (English Only) === 
+    
     // Clear cart function
     window.clearCartUniversal = async function(source = 'page') {
-        if (!confirm('Apakah Anda yakin ingin mengosongkan seluruh keranjang belanja?')) {
+        if (!confirm('Are you sure you want to clear your entire shopping cart?')) {
             return;
         }
         
@@ -442,20 +434,20 @@
             console.log('Clear cart response:', data);
             
             if (data.success) {
-                if (typeof updateCartBadge === 'function') {
-                    updateCartBadge(0);
+                // Update cart badge if function exists
+                if (window.updateCartBadgeGlobal) {
+                    window.updateCartBadgeGlobal(0);
                 }
                 
-                if (typeof fetchCartContent === 'function') {
-                    fetchCartContent();
+                // Refresh offcanvas if function exists
+                if (window.refreshCartOffcanvas) {
+                    window.refreshCartOffcanvas();
                 }
                 
-                if (typeof showCartToast === 'function') {
-                    showCartToast('Keranjang berhasil dikosongkan!', 'success');
-                } else {
-                    alert('Keranjang berhasil dikosongkan!');
-                }
+                // Show success notification
+                showGlobalNotification('Cart cleared successfully!', 'success');
                 
+                // Reload cart page if on cart page
                 if (window.location.pathname.includes('/cart')) {
                     setTimeout(() => location.reload(), 1000);
                 }
@@ -466,61 +458,58 @@
             
         } catch (error) {
             console.error('Error clearing cart:', error);
-            
-            if (typeof showCartToast === 'function') {
-                showCartToast('Gagal mengosongkan keranjang', 'error');
-            } else {
-                alert('Gagal mengosongkan keranjang');
-            }
+            showGlobalNotification('Failed to clear cart', 'error');
         }
     };
 
-    // Update quantity function
+    // Update quantity function for cart page
     window.updateQuantity = async function(rowId, newQuantity) {
-        if (newQuantity < 0) {
-            newQuantity = 0;
-        }
+        if (newQuantity < 0) newQuantity = 0;
         
         const cartItem = document.querySelector(`[data-row-id="${rowId}"]`);
         if (cartItem) cartItem.classList.add('loading');
         
         try {
-            const formData = new FormData();
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-            formData.append('quantity', newQuantity);
-            
             const response = await fetch(`/cart/update/${rowId}`, {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ quantity: newQuantity })
             });
             
-            if (response.ok) {
-                const result = await response.json();
-                
-                if (result.success) {
-                    if (newQuantity === 0 || result.removed) {
-                        alert('Produk berhasil dihapus dari keranjang!');
-                    } else {
-                        alert('Jumlah produk berhasil diupdate!');
-                    }
-                    location.reload();
+            const result = await response.json();
+            
+            if (result.success) {
+                if (newQuantity === 0 || result.removed) {
+                    showGlobalNotification('Product removed from cart successfully!', 'success');
                 } else {
-                    throw new Error(result.message || 'Failed to update quantity');
+                    showGlobalNotification('Quantity updated successfully!', 'success');
                 }
+                
+                // Update cart badge
+                if (window.updateCartBadgeGlobal) {
+                    window.updateCartBadgeGlobal(result.cartCount);
+                }
+                
+                setTimeout(() => location.reload(), 1000);
             } else {
-                throw new Error('Failed to update quantity');
+                throw new Error(result.message || 'Failed to update quantity');
             }
         } catch (error) {
             console.error('Error updating quantity:', error);
-            alert('Gagal mengupdate jumlah produk. Silakan coba lagi.');
+            showGlobalNotification('Failed to update quantity. Please try again.', 'error');
         }
         
         if (cartItem) cartItem.classList.remove('loading');
     };
 
-    // Remove item function
+    // Remove item function for cart page
     window.removeItem = async function(rowId, productName) {
-        if (!confirm(`Apakah Anda yakin ingin menghapus "${productName}" dari keranjang?`)) {
+        if (!confirm(`Are you sure you want to remove "${productName}" from your cart?`)) {
             return;
         }
         
@@ -537,25 +526,85 @@
                 }
             });
             
-            if (response.ok) {
-                const result = await response.json();
+            const result = await response.json();
+            
+            if (result.success) {
+                showGlobalNotification('Product removed from cart successfully!', 'success');
                 
-                if (result.success) {
-                    alert('Produk berhasil dihapus dari keranjang!');
-                    location.reload();
-                } else {
-                    throw new Error(result.message || 'Failed to remove item');
+                // Update cart badge
+                if (window.updateCartBadgeGlobal) {
+                    window.updateCartBadgeGlobal(result.cartCount);
                 }
+                
+                setTimeout(() => location.reload(), 1000);
             } else {
-                throw new Error('Failed to remove item');
+                throw new Error(result.message || 'Failed to remove item');
             }
         } catch (error) {
             console.error('Error removing item:', error);
-            alert('Gagal menghapus produk. Silakan coba lagi.');
+            showGlobalNotification('Failed to remove product. Please try again.', 'error');
         }
         
         if (cartItem) cartItem.classList.remove('loading');
     };
+
+    // Global notification function
+    function showGlobalNotification(message, type = 'success') {
+        // Remove existing notifications
+        const existingNotification = document.querySelector('.global-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed global-notification`;
+        notification.style.cssText = `
+            top: 100px; 
+            right: 20px; 
+            z-index: 9999; 
+            min-width: 320px;
+            max-width: 420px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+        `;
+        
+        const iconClass = type === 'success' ? 'check-circle' : 'exclamation-triangle';
+        
+        notification.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-${iconClass} me-3" style="font-size: 1.2rem;"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-bold mb-1">${type === 'success' ? 'Success!' : 'Error'}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">${message}</div>
+                </div>
+                <button type="button" class="btn-close ms-2" onclick="this.parentElement.parentElement.remove()" style="font-size: 0.8rem;"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animation
+        notification.style.transform = 'translateX(100%)';
+        notification.style.transition = 'transform 0.3s ease-out';
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Auto-remove after 4 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 4000);
+    }
 
     // Alias for backward compatibility
     window.clearCart = function() {

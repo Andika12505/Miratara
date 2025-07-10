@@ -2,7 +2,7 @@
 <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
     <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title" id="cartOffcanvasLabel">
-            <i class="fas fa-shopping-cart me-2"></i> Keranjang Belanja
+            <i class="fas fa-shopping-cart me-2"></i> Shopping Cart
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
@@ -13,14 +13,14 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-3 text-muted">Memuat keranjang...</p>
+            <p class="mt-3 text-muted">Loading cart...</p>
         </div>
     </div>
     
     <div class="offcanvas-footer border-top p-3" style="display: none;" id="cartOffcanvasFooter">
         <div class="d-grid gap-2">
             <a href="<?php echo e(route('cart.index')); ?>" class="btn btn-outline-primary">
-                <i class="fas fa-shopping-cart me-2"></i>Lihat Keranjang
+                <i class="fas fa-shopping-cart me-2"></i>View Cart
             </a>
             <a href="#" class="btn btn-primary">
                 <i class="fas fa-credit-card me-2"></i>Checkout
@@ -31,19 +31,17 @@
 
 <?php $__env->startPush('styles'); ?>
 <style>
-/* Make cart offcanvas wider for better readability */
+/* Cart offcanvas styling */
 #cartOffcanvas.offcanvas-end {
     width: 500px !important;
     max-width: 90vw;
 }
 
-/* Better spacing for cart content */
 #cartOffcanvas .offcanvas-body {
     padding: 1.5rem;
     line-height: 1.6;
 }
 
-/* Ensure cart items have proper spacing */
 #cartOffcanvas .cart-item {
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
@@ -55,13 +53,12 @@
     margin-bottom: 0;
 }
 
-/* Better button spacing in cart */
 #cartOffcanvas .btn {
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
 }
 
-/* Responsive behavior for smaller screens */
+/* Responsive design */
 @media (max-width: 768px) {
     #cartOffcanvas.offcanvas-end {
         width: 85vw !important;
@@ -94,8 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const cartOffcanvasFooter = document.getElementById('cartOffcanvasFooter');
     const cartCountBadge = document.querySelector('.cart-count');
 
-    // FETCH CART CONTENT
+    // Fetch cart content
     const fetchCartContent = async () => {
+        console.log('Fetching cart content...');
         showCartLoading();
         
         try {
@@ -116,10 +114,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const html = await response.text();
             offcanvasCartBody.innerHTML = html;
             
-            const hasItems = !html.includes('Keranjang Anda kosong');
+            const hasItems = !html.includes('Your cart is empty');
             cartOffcanvasFooter.style.display = hasItems ? 'block' : 'none';
             
-            // IMPORTANT: Attach event listeners after content is loaded
             attachCartEventListeners();
 
         } catch (error) {
@@ -128,15 +125,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // ATTACH EVENT LISTENERS to cart content
+    // Attach event listeners to cart content (ONLY for cart management, NOT form submissions)
     const attachCartEventListeners = () => {
-        console.log('Attaching cart event listeners...');
+        console.log('Attaching cart management event listeners...');
         
         // Quantity update buttons
         document.querySelectorAll('.update-cart-qty').forEach(button => {
             button.addEventListener('click', async function(e) {
                 e.preventDefault();
-                console.log('Quantity button clicked:', this.dataset.action);
                 
                 const rowId = this.dataset.rowid;
                 const action = this.dataset.action;
@@ -144,11 +140,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const currentQty = parseInt(currentQtySpan.textContent);
                 
                 let newQty = action === 'increase' ? currentQty + 1 : currentQty - 1;
-                
-                // Don't allow negative quantities
                 if (newQty < 0) newQty = 0;
                 
-                console.log(`Updating ${rowId} from ${currentQty} to ${newQty}`);
                 await updateCartQuantity(rowId, newQty);
             });
         });
@@ -157,10 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.remove-cart-item').forEach(button => {
             button.addEventListener('click', async function(e) {
                 e.preventDefault();
-                console.log('Remove button clicked for:', this.dataset.rowid);
-                
-                const rowId = this.dataset.rowid;
-                await removeCartItem(rowId);
+                await removeCartItem(this.dataset.rowid);
             });
         });
 
@@ -169,18 +159,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (clearCartBtn) {
             clearCartBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
-                if (confirm('Apakah Anda yakin ingin mengosongkan keranjang?')) {
+                if (confirm('Are you sure you want to clear your cart?')) {
                     await clearCart();
                 }
             });
         }
     };
 
-    // UPDATE CART QUANTITY
+    // Update cart quantity
     const updateCartQuantity = async (rowId, quantity) => {
         try {
-            console.log(`Making request to update ${rowId} to quantity ${quantity}`);
-            
             const response = await fetch(`<?php echo e(url('/cart/update')); ?>/${rowId}`, {
                 method: 'POST',
                 headers: {
@@ -193,33 +181,27 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const data = await response.json();
-            console.log('Update response:', data);
             
             if (data.success) {
                 updateCartBadge(data.cartCount);
-                fetchCartContent(); // Reload cart content
+                fetchCartContent();
                 
-                if (data.removed) {
-                    showCartToast('Produk berhasil dihapus!', 'success');
-                } else {
-                    showCartToast('Keranjang berhasil diupdate!', 'success');
-                }
+                const message = data.removed ? 'Product removed successfully!' : 'Cart updated successfully!';
+                showCartToast(message, 'success');
             } else {
                 throw new Error(data.message || 'Failed to update cart');
             }
         } catch (error) {
             console.error('Error updating cart:', error);
-            showCartToast('Gagal mengupdate keranjang', 'error');
+            showCartToast('Failed to update cart', 'error');
         }
     };
 
-    // REMOVE CART ITEM
+    // Remove cart item
     const removeCartItem = async (rowId) => {
         try {
-            console.log(`Making request to remove ${rowId}`);
-            
             const response = await fetch(`<?php echo e(url('/cart/remove')); ?>/${rowId}`, {
-                method: 'POST', // Using POST instead of DELETE for better compatibility
+                method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Accept': 'application/json',
@@ -228,22 +210,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const data = await response.json();
-            console.log('Remove response:', data);
             
             if (data.success) {
                 updateCartBadge(data.cartCount);
-                fetchCartContent(); // Reload cart content
-                showCartToast('Produk berhasil dihapus!', 'success');
+                fetchCartContent();
+                showCartToast('Product removed successfully!', 'success');
             } else {
                 throw new Error(data.message || 'Failed to remove item');
             }
         } catch (error) {
             console.error('Error removing item:', error);
-            showCartToast('Gagal menghapus produk', 'error');
+            showCartToast('Failed to remove product', 'error');
         }
     };
 
-    // Replace the old clearCart function with:
+    // Clear cart
     const clearCart = () => {
         window.clearCartUniversal('offcanvas');
     };
@@ -255,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-3 text-muted">Memuat keranjang...</p>
+                <p class="mt-3 text-muted">Loading cart...</p>
             </div>
         `;
         cartOffcanvasFooter.style.display = 'none';
@@ -265,10 +246,10 @@ document.addEventListener('DOMContentLoaded', function() {
         offcanvasCartBody.innerHTML = `
             <div class="text-center py-5">
                 <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                <h6 class="text-muted">Keranjang Anda kosong</h6>
-                <p class="text-muted small">Terjadi kesalahan saat memuat keranjang</p>
+                <h6 class="text-muted">Your cart is empty</h6>
+                <p class="text-muted small">Error loading cart content</p>
                 <a href="<?php echo e(route('products.index')); ?>" class="btn btn-primary btn-sm mt-2">
-                    <i class="fas fa-shopping-bag me-2"></i>Mulai Belanja
+                    <i class="fas fa-shopping-bag me-2"></i>Start Shopping
                 </a>
             </div>
         `;
@@ -282,88 +263,84 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // Toast notifications
     const showCartToast = (message, type = 'success') => {
+        // Remove existing toasts
+        const existingToast = document.querySelector('.cart-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
         const toast = document.createElement('div');
-        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed cart-toast`;
         toast.style.cssText = `
             top: 100px; 
             right: 20px; 
             z-index: 9999; 
-            min-width: 300px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 320px;
+            max-width: 420px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
         `;
+        
+        const iconClass = type === 'success' ? 'check-circle' : 'exclamation-triangle';
+        
         toast.innerHTML = `
             <div class="d-flex align-items-center">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                ${message}
+                <i class="fas fa-${iconClass} me-3" style="font-size: 1.2rem;"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-bold mb-1">${type === 'success' ? 'Success!' : 'Error'}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">${message}</div>
+                </div>
+                <button type="button" class="btn-close ms-2" onclick="this.parentElement.parentElement.remove()" style="font-size: 0.8rem;"></button>
             </div>
         `;
         
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        
+        // Animation
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'transform 0.3s ease-out';
+        
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Auto-remove after 4 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, 4000);
     };
 
-    // Event listener untuk membuka offcanvas
+    // Event listener for opening offcanvas
     if (cartOffcanvasEl) {
         cartOffcanvasEl.addEventListener('show.bs.offcanvas', function () {
             fetchCartContent();
         });
     }
 
-    // HANDLE ADD TO CART FORM SUBMISSION (existing code)
-    const handleAddToCart = (form) => {
-        const button = form.querySelector('button[type="submit"]');
-        const originalButtonText = button.innerHTML;
-        
-        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Menambahkan...';
-        button.disabled = true;
-
-        const formData = new FormData(form);
-
-        fetch('<?php echo e(route("cart.add")); ?>', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateCartBadge(data.cartCount);
-                
-                button.innerHTML = '<i class="fas fa-check me-2"></i>Ditambahkan!';
-                button.classList.add('btn-success');
-                
-                setTimeout(() => {
-                    button.innerHTML = originalButtonText;
-                    button.disabled = false;
-                    button.classList.remove('btn-success');
-                }, 1500);
-
-                showCartToast('Produk berhasil ditambahkan ke keranjang!', 'success');
-            } else {
-                throw new Error(data.message || 'Gagal menambahkan produk');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showCartToast('Terjadi kesalahan. Silakan coba lagi.', 'error');
-            
-            button.innerHTML = originalButtonText;
-            button.disabled = false;
-        });
+    // GLOBAL FUNCTION: Refresh cart when product is added from other components
+    window.refreshCartOffcanvas = function() {
+        // Only refresh if offcanvas is currently open
+        const cartOffcanvas = document.getElementById('cartOffcanvas');
+        if (cartOffcanvas && cartOffcanvas.classList.contains('show')) {
+            fetchCartContent();
+        }
     };
 
-    // Event delegation untuk form add to cart
-    document.addEventListener('submit', function(e) {
-        if (e.target.classList.contains('add-to-cart-form')) {
-            e.preventDefault();
-            handleAddToCart(e.target);
-        }
-    });
+    // GLOBAL FUNCTION: Update cart badge from other components
+    window.updateCartBadgeGlobal = function(count) {
+        updateCartBadge(count);
+    };
 });
 </script>
 <?php $__env->stopPush(); ?><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/components/cart-offcanvas.blade.php ENDPATH**/ ?>

@@ -144,12 +144,3 @@ Route::middleware(['web'])->prefix('cart')->group(function () {
 
 // Rute autentikasi bawaan Laravel (biasanya dari auth.php)
 require __DIR__.'/auth.php';
-
-// Rute untuk Debug (bisa dihapus nanti)
-Route::get('/debug-user', function() {
-    return Auth::check() ? response()->json(Auth::user()) : 'Not logged in';
-})->middleware('auth');
-
-Route::get('/test-products', function() {
-    // ... (kode debug produk Anda tetap di sini)
-});

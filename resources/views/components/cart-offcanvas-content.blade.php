@@ -1,11 +1,12 @@
-{{-- resources/views/components/cart-offcanvas-content.blade.php --}}
+{{-- File path: resources/views/components/cart-offcanvas-content.blade.php --}}
+
 @if($cartItems->isEmpty())
     <div class="text-center py-5">
         <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-        <h6 class="text-muted">Keranjang Anda kosong</h6>
-        <p class="text-muted small">Mulai berbelanja dan tambahkan produk ke keranjang</p>
+        <h6 class="text-muted">Your cart is empty</h6>
+        <p class="text-muted small">Start shopping and add products to your cart</p>
         <a href="{{ route('products.index') }}" class="btn btn-primary btn-sm mt-2">
-            <i class="fas fa-shopping-bag me-2"></i>Mulai Belanja
+            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
         </a>
     </div>
 @else
@@ -15,11 +16,23 @@
             <div class="cart-item d-flex align-items-center mb-3 pb-3 border-bottom">
                 {{-- Product Image --}}
                 <div class="flex-shrink-0 me-3">
-                    @if(strlen($item->options->image ?? '') > 0)
-                        <img src="{{ asset('images/' . $item->options->image) }}" 
+                    @php
+                        $imageUrl = '';
+                        if (isset($item->options['image']) && !empty($item->options['image'])) {
+                            $imageUrl = asset('images/' . $item->options['image']);
+                        }
+                    @endphp
+                    
+                    @if($imageUrl)
+                        <img src="{{ $imageUrl }}" 
                              alt="{{ $item->name }}" 
                              class="rounded" 
-                             style="width: 60px; height: 60px; object-fit: cover;">
+                             style="width: 60px; height: 60px; object-fit: cover;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="bg-light rounded d-none align-items-center justify-content-center" 
+                             style="width: 60px; height: 60px;">
+                            <i class="fas fa-image text-muted"></i>
+                        </div>
                     @else
                         <div class="bg-light rounded d-flex align-items-center justify-content-center" 
                              style="width: 60px; height: 60px;">
@@ -31,6 +44,16 @@
                 {{-- Product Details --}}
                 <div class="flex-grow-1">
                     <h6 class="mb-1 fw-bold" style="font-size: 0.9rem;">{{ $item->name }}</h6>
+                    
+                    {{-- Size Information --}}
+                    @if(isset($item->options['has_size']) && $item->options['has_size'] && isset($item->options['size_name']))
+                        <div class="small text-muted mb-1">
+                            <span class="badge bg-light text-dark border">
+                                Size: {{ $item->options['size_display'] ?? $item->options['size_name'] }}
+                            </span>
+                        </div>
+                    @endif
+                    
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <span class="text-primary fw-bold">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
@@ -67,12 +90,19 @@
     <div class="cart-summary mt-4 pt-3 border-top">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="fw-bold">Subtotal:</span>
-            <span class="fw-bold text-primary">Rp {{ number_format(str_replace(',', '', $cartTotal), 0, ',', '.') }}</span>
+            <span class="fw-bold text-primary">
+                @php
+                    // Handle the formatted string properly
+                    $totalValue = str_replace([',', '.'], ['', ''], $cartTotal);
+                    $totalNumeric = intval($totalValue) / 100; // Convert back from cents
+                @endphp
+                Rp {{ number_format($totalNumeric, 0, ',', '.') }}
+            </span>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <small class="text-muted">{{ $cartCount }} item(s)</small>
             <button type="button" class="btn btn-outline-danger btn-sm clear-cart">
-                <i class="fas fa-trash me-1"></i>Kosongkan
+                <i class="fas fa-trash me-1"></i>Clear Cart
             </button>
         </div>
     </div>

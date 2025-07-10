@@ -651,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Update selected size info
-                selectedSizeInfo.textContent = `Size ${sizeName} selected`;
+                selectedSizeInfo.textContent = `Size ${sizeName} selected (${stock} available)`;
                 selectedSizeInfo.className = 'text-success';
                 
                 // Enable add to cart if size selected and has stock
@@ -663,7 +663,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial setup
     function updateAddToCartButton() {
         if (!hasSize) {
-            // No sizes required, button should work
+            // No sizes required, button should work if product has stock
+            const productStock = <?php echo e($product->display_stock); ?>;
+            if (productStock > 0) {
+                addToCartBtn.disabled = false;
+                addToCartText.textContent = 'ADD TO CART';
+            } else {
+                addToCartBtn.disabled = true;
+                addToCartText.textContent = 'OUT OF STOCK';
+            }
             return;
         }
         
@@ -690,30 +698,156 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial button state
     updateAddToCartButton();
 
-    // Form submission validation
+    // Enhanced form submission with size validation
     addToCartForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Always prevent default and use AJAX
+        
+        // Validate size selection for products with sizes
         if (hasSize && !selectedSizeInput.value) {
-            e.preventDefault();
-            alert('Please select a size before adding to cart.');
+            showValidationError('Please select a size before adding to cart.');
             return false;
         }
         
-        const submitBtn = this.querySelector('.add-to-cart-btn');
+        // Validate quantity
+        const quantity = parseInt(quantityInput.value);
+        const maxQuantity = parseInt(quantityInput.getAttribute('max'));
+        
+        if (quantity <= 0) {
+            showValidationError('Please select a valid quantity.');
+            return false;
+        }
+        
+        if (quantity > maxQuantity) {
+            showValidationError(`Only ${maxQuantity} items available.`);
+            return false;
+        }
+        
+        // Submit via AJAX
+        submitCartForm(this);
+    });
+
+    // AJAX form submission
+    function submitCartForm(form) {
+        const submitBtn = form.querySelector('.add-to-cart-btn');
         const originalText = submitBtn.innerHTML;
         
         // Show loading state
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
         submitBtn.disabled = true;
         
-        // Re-enable button after 3 seconds in case of issues
-        setTimeout(() => {
+        // Prepare form data
+        const formData = new FormData(form);
+        
+        fetch('<?php echo e(route("cart.add")); ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart badge if global function exists
+                if (window.updateCartBadgeGlobal) {
+                    window.updateCartBadgeGlobal(data.cartCount);
+                }
+                
+                // Refresh offcanvas if it's open and function exists
+                if (window.refreshCartOffcanvas) {
+                    window.refreshCartOffcanvas();
+                }
+                
+                // Show success state
+                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Added to Cart!';
+                submitBtn.classList.add('btn-success');
+                
+                // Show success message with size info
+                let message = data.message;
+                showSuccessToast(message);
+                
+                // Reset button after delay
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-success');
+                    updateAddToCartButton();
+                }, 2000);
+                
+            } else {
+                throw new Error(data.message || 'Failed to add product to cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorToast(error.message || 'An error occurred. Please try again.');
+            
+            // Reset button
             submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
             updateAddToCartButton();
-        }, 3000);
-    });
+        });
+    }
+
+    // Helper functions
+    function showValidationError(message) {
+        showErrorToast(message);
+        
+        // Highlight the relevant field
+        if (hasSize && !selectedSizeInput.value) {
+            selectedSizeInfo.textContent = message;
+            selectedSizeInfo.className = 'text-danger';
+        }
+    }
+
+    function showSuccessToast(message) {
+        showToast(message, 'success');
+    }
+
+    function showErrorToast(message) {
+        showToast(message, 'error');
+    }
+
+    function showToast(message, type = 'success') {
+        // Remove any existing toasts
+        const existingToast = document.querySelector('.product-detail-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed product-detail-toast`;
+        toast.style.cssText = `
+            top: 100px; 
+            right: 20px; 
+            z-index: 9999; 
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+        `;
+        toast.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                <span>${message}</span>
+                <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Auto-remove after 4 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 4000);
+    }
 });
 
-// Quantity controls
+// Quantity controls (keep existing functions)
 function increaseQuantity() {
     const input = document.getElementById('quantity');
     const currentValue = parseInt(input.value);
