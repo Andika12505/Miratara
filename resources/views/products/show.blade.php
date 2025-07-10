@@ -69,14 +69,49 @@
                 </div>
                 @endif
 
-                {{-- Size Selection (Placeholder for future) --}}
+                {{-- Size Selection --}}
                 <div class="size-selection mb-4">
                     <h5>Size</h5>
-                    <div class="size-options">
-                        <div class="alert alert-info">
-                            <small><i class="fas fa-info-circle me-2"></i>Size selection will be available soon. For now, contact us for size information.</small>
+                    @if($product->hasSizes())
+                        <div class="size-options">
+                            <div class="size-buttons-grid">
+                                @foreach($product->sizes as $size)
+                                    <div class="size-option {{ $size->pivot->stock <= 0 ? 'out-of-stock' : '' }}" 
+                                         data-size-id="{{ $size->id }}"
+                                         data-size-name="{{ $size->name }}"
+                                         data-stock="{{ $size->pivot->stock }}">
+                                        <input type="radio" 
+                                               name="size_id" 
+                                               id="size_{{ $size->id }}" 
+                                               value="{{ $size->id }}"
+                                               class="size-radio"
+                                               {{ $size->pivot->stock <= 0 || !$size->pivot->is_available ? 'disabled' : '' }}
+                                               {{ $loop->first && $size->pivot->stock > 0 ? 'checked' : '' }}>
+                                        <label for="size_{{ $size->id }}" class="size-label">
+                                            <span class="size-name">{{ $size->name }}</span>
+                                            <span class="size-display">{{ $size->display }}</span>
+                                            @if($size->pivot->stock <= 0)
+                                                <span class="stock-info out">Out of Stock</span>
+                                            @elseif($size->pivot->stock <= 3)
+                                                <span class="stock-info low">Only {{ $size->pivot->stock }} left</span>
+                                            @else
+                                                <span class="stock-info available">In Stock</span>
+                                            @endif
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="selected-size-info mt-2">
+                                <small class="text-muted">Select a size to continue</small>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <div class="size-options">
+                            <div class="alert alert-info">
+                                <small><i class="fas fa-info-circle me-2"></i>One size fits all. No size selection needed.</small>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Quantity & Add to Cart --}}
@@ -84,20 +119,21 @@
                     <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form">
                         @csrf
                         <input type="hidden" name="id" value="{{ $product->id }}">
+                        <input type="hidden" name="size_id" id="selected_size_id" value="">
                         
                         <div class="quantity-section mb-3">
                             <label for="quantity" class="form-label">Quantity</label>
                             <div class="input-group quantity-input-group" style="width: 150px;">
                                 <button type="button" class="btn btn-outline-secondary quantity-btn" onclick="decreaseQuantity()">-</button>
-                                <input type="number" id="quantity" name="quantity" class="form-control text-center" value="1" min="1" max="{{ $product->stock }}" {{ $product->stock <= 0 ? 'disabled' : '' }}>
+                                <input type="number" id="quantity" name="quantity" class="form-control text-center" value="1" min="1" max="{{ $product->display_stock }}" {{ $product->isInStock() ? '' : 'disabled' }}>
                                 <button type="button" class="btn btn-outline-secondary quantity-btn" onclick="increaseQuantity()">+</button>
                             </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary add-to-cart-btn" {{ $product->stock <= 0 ? 'disabled' : '' }}>
+                            <button type="submit" class="btn btn-primary add-to-cart-btn" id="addToCartBtn" {{ $product->isInStock() ? '' : 'disabled' }}>
                                 <i class="fas fa-shopping-cart me-2"></i>
-                                {{ $product->stock <= 0 ? 'OUT OF STOCK' : 'ADD TO CART' }}
+                                <span id="addToCartText">{{ $product->isInStock() ? 'ADD TO CART' : 'OUT OF STOCK' }}</span>
                             </button>
                         </div>
                     </form>
@@ -291,11 +327,118 @@
 }
 
 /* Size Selection */
-.size-options .alert {
-    border: 1px solid #ffc0cb;
+.size-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.size-option {
+    position: relative;
+}
+
+.size-radio {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.size-label {
+    display: block;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    user-select: none;
+}
+
+.size-label:hover {
+    border-color: #ffc0cb;
+    background: rgba(255, 192, 203, 0.05);
+}
+
+.size-radio:checked + .size-label {
+    border-color: #ffc0cb;
     background: rgba(255, 192, 203, 0.1);
+    color: #333;
+}
+
+.size-radio:disabled + .size-label {
+    background: #f8f9fa;
+    color: #999;
+    border-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.size-option.out-of-stock .size-label {
+    background: #f8f9fa;
+    color: #999;
+    border-color: #e9ecef;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.size-option.out-of-stock .size-label::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: #999;
+    transform: translateY(-50%);
+}
+
+.size-name {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.size-display {
+    display: block;
+    font-size: 0.8rem;
     color: #666;
-    margin-bottom: 0;
+    margin-bottom: 4px;
+}
+
+.stock-info {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stock-info.available {
+    color: #28a745;
+}
+
+.stock-info.low {
+    color: #ffc107;
+}
+
+.stock-info.out {
+    color: #dc3545;
+}
+
+.selected-size-info {
+    text-align: center;
+    min-height: 20px;
+}
+
+.size-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    display: none;
 }
 
 /* Purchase Section */
@@ -377,6 +520,14 @@
 /* Related Products Section */
 .related-products-section {
     border-top: 1px solid #eee;
+}
+
+.related-products-section .product-info {
+    text-align: center;
+}
+
+.related-products-section .product-pricing {
+    justify-content: center;
 }
 
 .section-title {
@@ -461,6 +612,97 @@
 
 @push('scripts')
 <script>
+// Size and quantity management
+document.addEventListener('DOMContentLoaded', function() {
+    const quantityInput = document.getElementById('quantity');
+    const addToCartForm = document.querySelector('.add-to-cart-form');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const addToCartText = document.getElementById('addToCartText');
+    const selectedSizeInput = document.getElementById('selected_size_id');
+    const selectedSizeInfo = document.querySelector('.selected-size-info small');
+    const sizeRadios = document.querySelectorAll('.size-radio');
+    const hasSize = {{ $product->hasSizes() ? 'true' : 'false' }};
+
+    // Size selection handling
+    sizeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const sizeOption = this.closest('.size-option');
+                const sizeName = sizeOption.dataset.sizeName;
+                const stock = parseInt(sizeOption.dataset.stock);
+                
+                // Update hidden input
+                selectedSizeInput.value = this.value;
+                
+                // Update quantity max based on selected size stock
+                quantityInput.setAttribute('max', stock);
+                if (parseInt(quantityInput.value) > stock) {
+                    quantityInput.value = Math.min(stock, 1);
+                }
+                
+                // Update selected size info
+                selectedSizeInfo.textContent = `Size ${sizeName} selected`;
+                selectedSizeInfo.className = 'text-success';
+                
+                // Enable add to cart if size selected and has stock
+                updateAddToCartButton();
+            }
+        });
+    });
+
+    // Initial setup
+    function updateAddToCartButton() {
+        if (!hasSize) {
+            // No sizes required, button should work
+            return;
+        }
+        
+        const selectedSize = document.querySelector('.size-radio:checked');
+        if (!selectedSize) {
+            addToCartBtn.disabled = true;
+            addToCartText.textContent = 'SELECT SIZE';
+            selectedSizeInfo.textContent = 'Select a size to continue';
+            selectedSizeInfo.className = 'text-muted';
+        } else {
+            const sizeOption = selectedSize.closest('.size-option');
+            const stock = parseInt(sizeOption.dataset.stock);
+            
+            if (stock > 0) {
+                addToCartBtn.disabled = false;
+                addToCartText.textContent = 'ADD TO CART';
+            } else {
+                addToCartBtn.disabled = true;
+                addToCartText.textContent = 'OUT OF STOCK';
+            }
+        }
+    }
+
+    // Initial button state
+    updateAddToCartButton();
+
+    // Form submission validation
+    addToCartForm.addEventListener('submit', function(e) {
+        if (hasSize && !selectedSizeInput.value) {
+            e.preventDefault();
+            alert('Please select a size before adding to cart.');
+            return false;
+        }
+        
+        const submitBtn = this.querySelector('.add-to-cart-btn');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+        submitBtn.disabled = true;
+        
+        // Re-enable button after 3 seconds in case of issues
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            updateAddToCartButton();
+        }, 3000);
+    });
+});
+
 // Quantity controls
 function increaseQuantity() {
     const input = document.getElementById('quantity');
@@ -481,27 +723,5 @@ function decreaseQuantity() {
         input.value = currentValue - 1;
     }
 }
-
-// Add to cart form handling
-document.addEventListener('DOMContentLoaded', function() {
-    const addToCartForm = document.querySelector('.add-to-cart-form');
-    
-    if (addToCartForm) {
-        addToCartForm.addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('.add-to-cart-btn');
-            const originalText = submitBtn.innerHTML;
-            
-            // Show loading state
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
-            submitBtn.disabled = true;
-            
-            // Re-enable button after 3 seconds in case of issues
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 3000);
-        });
-    }
-});
 </script>
 @endpush

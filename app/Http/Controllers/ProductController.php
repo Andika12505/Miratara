@@ -175,7 +175,7 @@ class ProductController extends Controller
         // Find product by slug
         $product = Product::where('slug', $slug)
                          ->where('is_active', true)
-                         ->with('category')
+                         ->with(['category', 'sizes'])
                          ->firstOrFail();
 
         // Get related products from same category (excluding current product)

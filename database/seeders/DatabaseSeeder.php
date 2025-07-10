@@ -1,4 +1,5 @@
 <?php
+// database/seeders/DatabaseSeeder.php
 
 namespace Database\Seeders;
 
@@ -26,6 +27,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CsArticleSeeder::class,
             TicketCategorySeeder::class,
+            // NEW: Size system seeders
+            SizesTableSeeder::class,
+            SampleProductSizesSeeder::class,
         ]);
     }
 }
