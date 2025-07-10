@@ -31,7 +31,7 @@
 </head>
 <body>
     <div class="container py-4">
-        <div class="account-header">
+        <div class="account-header mt-5">
             <h1>Akun Saya</h1>
             <p class="text-muted">Kelola informasi profil, transaksi, dan keranjang belanja Anda.</p>
         </div>
@@ -50,7 +50,7 @@
             </div>
 
             <div class="col-md-9">
-                <div class="card profile-card mb-4" id="biodataSectionContent">
+                <div class="card profile-card" id="biodataSectionContent">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Detail Biodata</h5>
                     </div>
@@ -183,12 +183,6 @@
             </div>
         </div>
     </div>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 MiraTara. All rights reserved.</p>
-        </div>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

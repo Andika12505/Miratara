@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/ProductController.php
 
 namespace App\Http\Controllers;
 
@@ -163,6 +164,42 @@ class ProductController extends Controller
             'availableGeneralTags' => $availableGeneralTags ?? [],
             'availableOrigins' => $availableOrigins,
             'request' => $request
+        ]);
+    }
+
+    /**
+     * NEW: Show individual product detail page
+     */
+    public function show(string $slug): View
+    {
+        // Find product by slug
+        $product = Product::where('slug', $slug)
+                         ->where('is_active', true)
+                         ->with('category')
+                         ->firstOrFail();
+
+        // Get related products from same category (excluding current product)
+        $relatedProducts = Product::where('category_id', $product->category_id)
+                                 ->where('is_active', true)
+                                 ->where('id', '!=', $product->id)
+                                 ->limit(4)
+                                 ->get();
+
+        // Extract vibe attributes for display
+        $vibeAttributes = $product->metadata['vibe_attributes'] ?? [];
+        $generalTags = $product->metadata['general_tags'] ?? [];
+        $origin = $product->metadata['origin'] ?? null;
+
+        // Get category for breadcrumb
+        $category = $product->category;
+
+        return view('products.show', [
+            'product' => $product,
+            'relatedProducts' => $relatedProducts,
+            'vibeAttributes' => $vibeAttributes,
+            'generalTags' => $generalTags,
+            'origin' => $origin,
+            'category' => $category
         ]);
     }
 }

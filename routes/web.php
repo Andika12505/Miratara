@@ -1,4 +1,5 @@
 <?php
+// routes/web.php
 
 use Illuminate\Support\Facades\Route;
 // Import Controllers
@@ -30,6 +31,9 @@ Route::get('/daftar', function() { return view('auth.register'); })->name('regis
 // Rute publik lainnya
 Route::get('/checkout', function() { return "Ini halaman Checkout (belum diimplementasi)"; })->name('checkout_page');
 Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
+
+// NEW: Product detail page route
+Route::get('/products/{slug}', [PublicProductController::class, 'show'])->name('products.show');
 
 /*
 |--------------------------------------------------------------------------
