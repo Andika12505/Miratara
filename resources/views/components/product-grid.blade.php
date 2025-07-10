@@ -8,7 +8,7 @@
                     <div class="product-image-container position-relative">
                         @if($showDiscount && isset($product->metadata['is_discounted']) && $product->metadata['is_discounted'])
                             <div class="discount-badge">
-                                <span>DISKON</span>
+                                <span>DISCOUNT</span>
                             </div>
                         @endif
                         <img src="{{ $product->image ? asset('images/' . $product->image) : asset('images/placeholder.jpg') }}"
@@ -32,19 +32,61 @@
                 {{-- Add to Cart Button (outside the link) --}}
                 <div class="product-actions">
                     @if($useFormCart)
-                        <form action="{{ route('cart.add') }}" method="POST" class="d-grid add-to-cart-form">
-                            @csrf
-                            <input type="hidden" name="id" value="{{ $product->id }}">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="add-to-bag-btn" {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                {{ $product->stock <= 0 ? $outOfStockText : $buttonText }}
+                        @php
+                            // Check if product has sizes and get first available size
+                            $hasSize = $product->hasSizes();
+                            $firstAvailableSize = null;
+                            $isInStock = false;
+                            
+                            if ($hasSize) {
+                                $firstAvailableSize = $product->availableSizes()->first();
+                                $isInStock = $firstAvailableSize !== null;
+                            } else {
+                                $isInStock = $product->stock > 0;
+                            }
+                        @endphp
+                        
+                        @if($isInStock)
+                            <form action="{{ route('cart.add') }}" method="POST" class="d-grid add-to-cart-form">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $product->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                
+                                {{-- For products with sizes, include default size --}}
+                                @if($hasSize && $firstAvailableSize)
+                                    <input type="hidden" name="size_id" value="{{ $firstAvailableSize->id }}">
+                                    <input type="hidden" name="default_size_id" value="{{ $firstAvailableSize->id }}">
+                                @endif
+                                
+                                <button type="submit" class="add-to-bag-btn">
+                                    @if($hasSize && $firstAvailableSize)
+                                        {{ $buttonText }} (Size {{ $firstAvailableSize->name }})
+                                    @else
+                                        {{ $buttonText }}
+                                    @endif
+                                </button>
+                            </form>
+                        @else
+                            {{-- Out of stock or no available sizes --}}
+                            <button class="add-to-bag-btn" disabled>
+                                {{ $outOfStockText }}
                             </button>
-                        </form>
+                        @endif
+                        
+                        {{-- Size info for products with multiple sizes --}}
+                        @if($hasSize && $product->availableSizes()->count() > 1)
+                            <div class="size-info mt-1">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    More sizes available - <a href="{{ route('products.show', $product->slug) }}" class="text-decoration-none">view details</a>
+                                </small>
+                            </div>
+                        @endif
                     @else
                         <button class="add-to-bag-btn"
                                 data-product-id="{{ $product->id }}"
-                                {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                            {{ $product->stock <= 0 ? $outOfStockText : $buttonText }}
+                                {{ !$isInStock ? 'disabled' : '' }}>
+                            {{ !$isInStock ? $outOfStockText : $buttonText }}
                         </button>
                     @endif
                 </div>
@@ -54,7 +96,9 @@
         <div class="col-12">
             <div class="text-center py-5">
                 <p class="text-muted">{{ $emptyMessage }}</p>
-                <a href="{{ route('products.index') }}" class="{{ $emptyButtonClass }} mt-3">{{ $emptyButtonText }}</a>
+                @if($emptyButtonText)
+                    <a href="{{ route('products.index') }}" class="{{ $emptyButtonClass }} mt-3">{{ $emptyButtonText }}</a>
+                @endif
             </div>
         </div>
     @endforelse
@@ -193,6 +237,20 @@
     cursor: not-allowed;
 }
 
+/* Size info styling */
+.size-info {
+    text-align: center;
+}
+
+.size-info a {
+    color: #ffc0cb;
+    font-weight: 500;
+}
+
+.size-info a:hover {
+    color: #ff8fab;
+}
+
 /* Grid layout */
 .row.g-4 {
     display: flex;
@@ -206,34 +264,6 @@
 
 .row.g-4 .product-card {
     width: 100%;
-}
-
-/* Quick view button on hover (optional enhancement) */
-.product-card {
-    position: relative;
-}
-
-.quick-view-btn {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 192, 203, 0.9);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    border-radius: 4px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 10;
-    text-transform: uppercase;
-}
-
-.product-image-container:hover .quick-view-btn {
-    opacity: 1;
 }
 
 /* Responsive adjustments */

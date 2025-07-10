@@ -447,7 +447,7 @@
                 }
                 
                 // Show success notification
-                showGlobalNotification('Cart cleared successfully!', 'success');
+                window.showGlobalNotification('Cart cleared successfully!', 'success');
                 
                 // Reload cart page if on cart page
                 if (window.location.pathname.includes('/cart')) {
@@ -460,7 +460,7 @@
             
         } catch (error) {
             console.error('Error clearing cart:', error);
-            showGlobalNotification('Failed to clear cart', 'error');
+            window.showGlobalNotification('Failed to clear cart', 'error');
         }
     };
 
@@ -487,9 +487,9 @@
             
             if (result.success) {
                 if (newQuantity === 0 || result.removed) {
-                    showGlobalNotification('Product removed from cart successfully!', 'success');
+                    window.showGlobalNotification('Product removed from cart successfully!', 'success');
                 } else {
-                    showGlobalNotification('Quantity updated successfully!', 'success');
+                    window.showGlobalNotification('Quantity updated successfully!', 'success');
                 }
                 
                 // Update cart badge
@@ -503,7 +503,7 @@
             }
         } catch (error) {
             console.error('Error updating quantity:', error);
-            showGlobalNotification('Failed to update quantity. Please try again.', 'error');
+            window.showGlobalNotification('Failed to update quantity. Please try again.', 'error');
         }
         
         if (cartItem) cartItem.classList.remove('loading');
@@ -531,7 +531,7 @@
             const result = await response.json();
             
             if (result.success) {
-                showGlobalNotification('Product removed from cart successfully!', 'success');
+                window.showGlobalNotification('Product removed from cart successfully!', 'success');
                 
                 // Update cart badge
                 if (window.updateCartBadgeGlobal) {
@@ -544,14 +544,103 @@
             }
         } catch (error) {
             console.error('Error removing item:', error);
-            showGlobalNotification('Failed to remove product. Please try again.', 'error');
+            window.showGlobalNotification('Failed to remove product. Please try again.', 'error');
         }
         
         if (cartItem) cartItem.classList.remove('loading');
     };
 
+    // GLOBAL ADD TO CART HANDLER (for ProductGrid and other components)
+    window.handleAddToCartGlobal = function(form) {
+        const button = form.querySelector('button[type="submit"]');
+        const originalButtonText = button.innerHTML;
+        
+        // Check if product has sizes that need selection
+        const productHasSize = form.querySelector('input[name="size_id"]') !== null;
+        const selectedSizeId = form.querySelector('input[name="size_id"]')?.value;
+        
+        // For products with sizes from grid (no size selection), default to first available size
+        if (productHasSize && !selectedSizeId) {
+            // Try to find a hidden size input or default size
+            const hiddenSizeInput = form.querySelector('input[name="default_size_id"]');
+            if (hiddenSizeInput && hiddenSizeInput.value) {
+                // Set the size_id to the default size
+                const sizeInput = form.querySelector('input[name="size_id"]') || document.createElement('input');
+                sizeInput.type = 'hidden';
+                sizeInput.name = 'size_id';
+                sizeInput.value = hiddenSizeInput.value;
+                if (!form.querySelector('input[name="size_id"]')) {
+                    form.appendChild(sizeInput);
+                }
+            } else {
+                // No size selected and no default - show message
+                window.showGlobalNotification('This product requires size selection. Please visit the product page to choose a size.', 'error');
+                return;
+            }
+        }
+        
+        // Show loading state
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+        button.disabled = true;
+
+        const formData = new FormData(form);
+
+        fetch('<?php echo e(route("cart.add")); ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart badge
+                if (window.updateCartBadgeGlobal) {
+                    window.updateCartBadgeGlobal(data.cartCount);
+                }
+                
+                // Refresh offcanvas if open
+                if (window.refreshCartOffcanvas) {
+                    window.refreshCartOffcanvas();
+                }
+                
+                // Show success state
+                button.innerHTML = '<i class="fas fa-check me-2"></i>Added!';
+                button.classList.add('btn-success');
+                
+                // Show success message
+                let successMessage = 'Product added to cart successfully!';
+                if (data.sizeInfo) {
+                    successMessage = `Product added to cart (Size: ${data.sizeInfo.size_name})!`;
+                }
+                window.showGlobalNotification(successMessage, 'success');
+                
+                // Reset button after delay
+                setTimeout(() => {
+                    button.innerHTML = originalButtonText;
+                    button.disabled = false;
+                    button.classList.remove('btn-success');
+                }, 2000);
+                
+            } else {
+                throw new Error(data.message || 'Failed to add product to cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.showGlobalNotification(error.message || 'An error occurred. Please try again.', 'error');
+            
+            // Reset button
+            button.innerHTML = originalButtonText;
+            button.disabled = false;
+        });
+    };
+
     // Global notification function
-    function showGlobalNotification(message, type = 'success') {
+    window.showGlobalNotification = function(message, type = 'success') {
         // Remove existing notifications
         const existingNotification = document.querySelector('.global-notification');
         if (existingNotification) {
@@ -607,6 +696,14 @@
             }
         }, 4000);
     }
+
+    // Global event delegation for add to cart forms
+    document.addEventListener('submit', function(e) {
+        if (e.target.classList.contains('add-to-cart-form')) {
+            e.preventDefault();
+            handleAddToCartGlobal(e.target);
+        }
+    });
 
     // Alias for backward compatibility
     window.clearCart = function() {

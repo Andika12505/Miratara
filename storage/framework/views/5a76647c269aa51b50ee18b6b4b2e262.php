@@ -622,7 +622,7 @@
 
 <?php $__env->startPush('scripts'); ?>
 <script>
-// Size and quantity management
+// Size and quantity management (UI only - form submission handled globally)
 document.addEventListener('DOMContentLoaded', function() {
     const quantityInput = document.getElementById('quantity');
     const addToCartForm = document.querySelector('.add-to-cart-form');
@@ -698,12 +698,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial button state
     updateAddToCartButton();
 
-    // Enhanced form submission with size validation
+    // Form validation (submission handled by global handler)
     addToCartForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Always prevent default and use AJAX
-        
         // Validate size selection for products with sizes
         if (hasSize && !selectedSizeInput.value) {
+            e.preventDefault();
             showValidationError('Please select a size before adding to cart.');
             return false;
         }
@@ -713,137 +712,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const maxQuantity = parseInt(quantityInput.getAttribute('max'));
         
         if (quantity <= 0) {
+            e.preventDefault();
             showValidationError('Please select a valid quantity.');
             return false;
         }
         
         if (quantity > maxQuantity) {
+            e.preventDefault();
             showValidationError(`Only ${maxQuantity} items available.`);
             return false;
         }
         
-        // Submit via AJAX
-        submitCartForm(this);
+        // Let the global handler take over (don't prevent default)
+        console.log('Form validation passed, letting global handler process...');
     });
 
-    // AJAX form submission
-    function submitCartForm(form) {
-        const submitBtn = form.querySelector('.add-to-cart-btn');
-        const originalText = submitBtn.innerHTML;
-        
-        // Show loading state
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
-        submitBtn.disabled = true;
-        
-        // Prepare form data
-        const formData = new FormData(form);
-        
-        fetch('<?php echo e(route("cart.add")); ?>', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update cart badge if global function exists
-                if (window.updateCartBadgeGlobal) {
-                    window.updateCartBadgeGlobal(data.cartCount);
-                }
-                
-                // Refresh offcanvas if it's open and function exists
-                if (window.refreshCartOffcanvas) {
-                    window.refreshCartOffcanvas();
-                }
-                
-                // Show success state
-                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Added to Cart!';
-                submitBtn.classList.add('btn-success');
-                
-                // Show success message with size info
-                let message = data.message;
-                showSuccessToast(message);
-                
-                // Reset button after delay
-                setTimeout(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('btn-success');
-                    updateAddToCartButton();
-                }, 2000);
-                
-            } else {
-                throw new Error(data.message || 'Failed to add product to cart');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showErrorToast(error.message || 'An error occurred. Please try again.');
-            
-            // Reset button
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-            updateAddToCartButton();
-        });
-    }
-
-    // Helper functions
+    // Helper functions for validation errors
     function showValidationError(message) {
-        showErrorToast(message);
+        // Use global notification system
+        if (window.showGlobalNotification) {
+            window.showGlobalNotification(message, 'error');
+        } else {
+            alert(message);
+        }
         
         // Highlight the relevant field
         if (hasSize && !selectedSizeInput.value) {
             selectedSizeInfo.textContent = message;
             selectedSizeInfo.className = 'text-danger';
         }
-    }
-
-    function showSuccessToast(message) {
-        showToast(message, 'success');
-    }
-
-    function showErrorToast(message) {
-        showToast(message, 'error');
-    }
-
-    function showToast(message, type = 'success') {
-        // Remove any existing toasts
-        const existingToast = document.querySelector('.product-detail-toast');
-        if (existingToast) {
-            existingToast.remove();
-        }
-        
-        const toast = document.createElement('div');
-        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed product-detail-toast`;
-        toast.style.cssText = `
-            top: 100px; 
-            right: 20px; 
-            z-index: 9999; 
-            min-width: 300px;
-            max-width: 400px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-radius: 8px;
-        `;
-        toast.innerHTML = `
-            <div class="d-flex align-items-center">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                <span>${message}</span>
-                <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
-            </div>
-        `;
-        
-        document.body.appendChild(toast);
-        
-        // Auto-remove after 4 seconds
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.remove();
-            }
-        }, 4000);
     }
 });
 

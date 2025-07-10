@@ -8,7 +8,7 @@
                     <div class="product-image-container position-relative">
                         <?php if($showDiscount && isset($product->metadata['is_discounted']) && $product->metadata['is_discounted']): ?>
                             <div class="discount-badge">
-                                <span>DISKON</span>
+                                <span>DISCOUNT</span>
                             </div>
                         <?php endif; ?>
                         <img src="<?php echo e($product->image ? asset('images/' . $product->image) : asset('images/placeholder.jpg')); ?>"
@@ -32,20 +32,63 @@
                 
                 <div class="product-actions">
                     <?php if($useFormCart): ?>
-                        <form action="<?php echo e(route('cart.add')); ?>" method="POST" class="d-grid add-to-cart-form">
-                            <?php echo csrf_field(); ?>
-                            <input type="hidden" name="id" value="<?php echo e($product->id); ?>">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="add-to-bag-btn" <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
-                                <?php echo e($product->stock <= 0 ? $outOfStockText : $buttonText); ?>
+                        <?php
+                            // Check if product has sizes and get first available size
+                            $hasSize = $product->hasSizes();
+                            $firstAvailableSize = null;
+                            $isInStock = false;
+                            
+                            if ($hasSize) {
+                                $firstAvailableSize = $product->availableSizes()->first();
+                                $isInStock = $firstAvailableSize !== null;
+                            } else {
+                                $isInStock = $product->stock > 0;
+                            }
+                        ?>
+                        
+                        <?php if($isInStock): ?>
+                            <form action="<?php echo e(route('cart.add')); ?>" method="POST" class="d-grid add-to-cart-form">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="id" value="<?php echo e($product->id); ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                
+                                
+                                <?php if($hasSize && $firstAvailableSize): ?>
+                                    <input type="hidden" name="size_id" value="<?php echo e($firstAvailableSize->id); ?>">
+                                    <input type="hidden" name="default_size_id" value="<?php echo e($firstAvailableSize->id); ?>">
+                                <?php endif; ?>
+                                
+                                <button type="submit" class="add-to-bag-btn">
+                                    <?php if($hasSize && $firstAvailableSize): ?>
+                                        <?php echo e($buttonText); ?> (Size <?php echo e($firstAvailableSize->name); ?>)
+                                    <?php else: ?>
+                                        <?php echo e($buttonText); ?>
+
+                                    <?php endif; ?>
+                                </button>
+                            </form>
+                        <?php else: ?>
+                            
+                            <button class="add-to-bag-btn" disabled>
+                                <?php echo e($outOfStockText); ?>
 
                             </button>
-                        </form>
+                        <?php endif; ?>
+                        
+                        
+                        <?php if($hasSize && $product->availableSizes()->count() > 1): ?>
+                            <div class="size-info mt-1">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    More sizes available - <a href="<?php echo e(route('products.show', $product->slug)); ?>" class="text-decoration-none">view details</a>
+                                </small>
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <button class="add-to-bag-btn"
                                 data-product-id="<?php echo e($product->id); ?>"
-                                <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>
-                            <?php echo e($product->stock <= 0 ? $outOfStockText : $buttonText); ?>
+                                <?php echo e(!$isInStock ? 'disabled' : ''); ?>>
+                            <?php echo e(!$isInStock ? $outOfStockText : $buttonText); ?>
 
                         </button>
                     <?php endif; ?>
@@ -56,7 +99,9 @@
         <div class="col-12">
             <div class="text-center py-5">
                 <p class="text-muted"><?php echo e($emptyMessage); ?></p>
-                <a href="<?php echo e(route('products.index')); ?>" class="<?php echo e($emptyButtonClass); ?> mt-3"><?php echo e($emptyButtonText); ?></a>
+                <?php if($emptyButtonText): ?>
+                    <a href="<?php echo e(route('products.index')); ?>" class="<?php echo e($emptyButtonClass); ?> mt-3"><?php echo e($emptyButtonText); ?></a>
+                <?php endif; ?>
             </div>
         </div>
     <?php endif; ?>
@@ -195,6 +240,20 @@
     cursor: not-allowed;
 }
 
+/* Size info styling */
+.size-info {
+    text-align: center;
+}
+
+.size-info a {
+    color: #ffc0cb;
+    font-weight: 500;
+}
+
+.size-info a:hover {
+    color: #ff8fab;
+}
+
 /* Grid layout */
 .row.g-4 {
     display: flex;
@@ -208,34 +267,6 @@
 
 .row.g-4 .product-card {
     width: 100%;
-}
-
-/* Quick view button on hover (optional enhancement) */
-.product-card {
-    position: relative;
-}
-
-.quick-view-btn {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 192, 203, 0.9);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    border-radius: 4px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 10;
-    text-transform: uppercase;
-}
-
-.product-image-container:hover .quick-view-btn {
-    opacity: 1;
 }
 
 /* Responsive adjustments */
