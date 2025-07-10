@@ -1,4 +1,3 @@
-// resources/views/admin/categories/index.blade.php
 
 @extends('admin.layouts.app') {{-- SESUAIKAN DENGAN LOKASI LAYOUT UTAMA ADMIN KAMU --}}
 

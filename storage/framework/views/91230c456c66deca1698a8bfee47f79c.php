@@ -1,20 +1,20 @@
-{{-- resources/views/admin/layouts/app.blade.php --}}
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     
-    <title>@yield('title', 'Admin MiraTara')</title>
+    <title><?php echo $__env->yieldContent('title', 'Admin MiraTara'); ?></title>
     
-    {{-- CSS Assets --}}
-    <link rel="stylesheet" href="{{ asset('css/bootstrap/bootstrap.min.css') }}">
+    
+    <link rel="stylesheet" href="<?php echo e(asset('css/bootstrap/bootstrap.min.css')); ?>">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('themify-icons/themify-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin/admin.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('themify-icons/themify-icons.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/admin/admin.css')); ?>">
     
-    {{-- Custom Admin Styles --}}
+    
     <style>
         body {
             background-color: #f8f9fa;
@@ -196,54 +196,54 @@
         }
     </style>
     
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
-    {{-- Top Navigation Bar --}}
+    
     <nav class="navbar navbar-expand-lg admin-navbar fixed-top">
         <div class="container-fluid">
-            {{-- Sidebar Toggle Button --}}
+            
             <button class="sidebar-toggle d-lg-none" type="button" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
             
-            {{-- Brand Logo --}}
-            <a class="navbar-brand d-flex align-items-center" href="{{ route('admin.dashboard') }}">
-                <img src="{{ asset('images/logo1.png') }}" alt="Logo" height="32" class="me-2">
+            
+            <a class="navbar-brand d-flex align-items-center" href="<?php echo e(route('admin.dashboard')); ?>">
+                <img src="<?php echo e(asset('images/logo1.png')); ?>" alt="Logo" height="32" class="me-2">
                 <span class="fw-bold">Admin Panel</span>
             </a>
             
-            {{-- Right Side Navigation --}}
+            
             <div class="navbar-nav ms-auto">
-                {{-- User Dropdown --}}
+                
                 <div class="nav-item dropdown">
                     <button class="admin-dropdown-toggle dropdown-toggle d-flex align-items-center" 
                             type="button" 
                             id="adminUserDropdown" 
                             data-bs-toggle="dropdown" 
                             aria-expanded="false">
-                        @if (Auth::check() && Auth::user()->profile_photo_path)
-                            <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" 
+                        <?php if(Auth::check() && Auth::user()->profile_photo_path): ?>
+                            <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo_path)); ?>" 
                                  alt="Profile" 
                                  class="rounded-circle me-2" 
                                  style="width: 32px; height: 32px; object-fit: cover;">
-                        @else
+                        <?php else: ?>
                             <i class="fas fa-user-shield me-2"></i>
-                        @endif
-                        <span>{{ Auth::user()->username ?? 'Admin' }}</span>
+                        <?php endif; ?>
+                        <span><?php echo e(Auth::user()->username ?? 'Admin'); ?></span>
                     </button>
                     
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminUserDropdown">
                         <li>
-                            <a class="dropdown-item" href="{{ route('homepage') }}" target="_blank">
+                            <a class="dropdown-item" href="<?php echo e(route('homepage')); ?>" target="_blank">
                                 <i class="fas fa-external-link-alt me-2"></i>
                                 Lihat Website
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <form id="admin-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                @csrf
+                            <form id="admin-logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
+                                <?php echo csrf_field(); ?>
                             </form>
                             <a class="dropdown-item" 
                                href="#" 
@@ -258,45 +258,45 @@
         </div>
     </nav>
     
-    {{-- Sidebar --}}
+    
     <aside class="admin-sidebar" id="adminSidebar">
         
-        {{-- Sidebar Navigation --}}
+        
         <nav class="sidebar-nav">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link @if(Request::routeIs('admin.dashboard')) active @endif" 
-                       href="{{ route('admin.dashboard') }}">
+                    <a class="nav-link <?php if(Request::routeIs('admin.dashboard')): ?> active <?php endif; ?>" 
+                       href="<?php echo e(route('admin.dashboard')); ?>">
                         <i class="fas fa-tachometer-alt"></i>
                         Dashboard
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link @if(Request::routeIs('admin.users.*')) active @endif" 
-                       href="{{ route('admin.users.index') }}">
+                    <a class="nav-link <?php if(Request::routeIs('admin.users.*')): ?> active <?php endif; ?>" 
+                       href="<?php echo e(route('admin.users.index')); ?>">
                         <i class="fas fa-users"></i>
                         Kelola User
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link @if(Request::routeIs('admin.categories.*')) active @endif" 
-                       href="{{ route('admin.categories.index') }}">
+                    <a class="nav-link <?php if(Request::routeIs('admin.categories.*')): ?> active <?php endif; ?>" 
+                       href="<?php echo e(route('admin.categories.index')); ?>">
                         <i class="fas fa-tags"></i>
                         Kelola Kategori
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link @if(Request::routeIs('admin.products.*')) active @endif" 
-                       href="{{ route('admin.products.index') }}">
+                    <a class="nav-link <?php if(Request::routeIs('admin.products.*')): ?> active <?php endif; ?>" 
+                       href="<?php echo e(route('admin.products.index')); ?>">
                         <i class="fas fa-box-open"></i>
                         Kelola Produk
                     </a>
                 </li>
                 
-                {{-- Add more menu items as needed --}}
+                
                 <li class="nav-item">
                     <a class="nav-link" href="#">
                         <i class="fas fa-shopping-cart"></i>
@@ -318,7 +318,7 @@
                     </a>
                 </li>
                 
-                {{-- Separator --}}
+                
                 <li class="nav-item" style="border-bottom: 2px solid #495057; margin: 0.5rem 0;"></li>
                 
                 <li class="nav-item">
@@ -331,82 +331,87 @@
         </nav>
     </aside>
     
-    {{-- Mobile Sidebar Backdrop --}}
+    
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
     
-    {{-- Main Content Area --}}
+    
     <main class="admin-main-content" id="adminMainContent">
-        {{-- Content Header --}}
-        @if(!isset($hideContentHeader) || !$hideContentHeader)
+        
+        <?php if(!isset($hideContentHeader) || !$hideContentHeader): ?>
         <div class="content-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1>@yield('page-title', 'Dashboard')</h1>
-                    @if(isset($breadcrumbs) && count($breadcrumbs) > 0)
+                    <h1><?php echo $__env->yieldContent('page-title', 'Dashboard'); ?></h1>
+                    <?php if(isset($breadcrumbs) && count($breadcrumbs) > 0): ?>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb breadcrumb-nav">
-                                @foreach($breadcrumbs as $breadcrumb)
-                                    @if($loop->last)
+                                <?php $__currentLoopData = $breadcrumbs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $breadcrumb): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php if($loop->last): ?>
                                         <li class="breadcrumb-item active" aria-current="page">
-                                            {{ $breadcrumb['title'] }}
+                                            <?php echo e($breadcrumb['title']); ?>
+
                                         </li>
-                                    @else
+                                    <?php else: ?>
                                         <li class="breadcrumb-item">
-                                            <a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a>
+                                            <a href="<?php echo e($breadcrumb['url']); ?>"><?php echo e($breadcrumb['title']); ?></a>
                                         </li>
-                                    @endif
-                                @endforeach
+                                    <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ol>
                         </nav>
-                    @endif
+                    <?php endif; ?>
                 </div>
                 
-                @yield('content-header-actions')
+                <?php echo $__env->yieldContent('content-header-actions'); ?>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
         
-        {{-- Flash Messages --}}
-        @if(session('success'))
+        
+        <?php if(session('success')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
+                <?php echo e(session('success')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
         
-        @if(session('error'))
+        <?php if(session('error')): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="fas fa-exclamation-circle me-2"></i>
-                {{ session('error') }}
+                <?php echo e(session('error')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
         
-        @if(session('warning'))
+        <?php if(session('warning')): ?>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                {{ session('warning') }}
+                <?php echo e(session('warning')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
         
-        @if(session('info'))
+        <?php if(session('info')): ?>
             <div class="alert alert-info alert-dismissible fade show" role="alert">
                 <i class="fas fa-info-circle me-2"></i>
-                {{ session('info') }}
+                <?php echo e(session('info')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
         
-        {{-- Main Content --}}
-        @yield('content')
+        
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
     
-    {{-- JavaScript Assets --}}
-    <script src="{{ asset('js/bootstrap/bootstrap.bundle.min.js') }}"></script>
     
-    {{-- Admin Layout JavaScript --}}
+    <script src="<?php echo e(asset('js/bootstrap/bootstrap.bundle.min.js')); ?>"></script>
+    
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('sidebarToggle');
@@ -449,11 +454,11 @@
         });
     </script>
     
-    {{-- Include product form enhancements if needed --}}
-    @if(Request::routeIs('admin.products.*'))
-        <script src="{{ asset('js/admin/product-form-enhancements.js') }}"></script>
-    @endif
     
-    @stack('scripts')
+    <?php if(Request::routeIs('admin.products.*')): ?>
+        <script src="<?php echo e(asset('js/admin/product-form-enhancements.js')); ?>"></script>
+    <?php endif; ?>
+    
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
-</html>
+</html><?php /**PATH /Users/jerenovvidimy/Documents/MiraTaraTest/resources/views/admin/layouts/app.blade.php ENDPATH**/ ?>

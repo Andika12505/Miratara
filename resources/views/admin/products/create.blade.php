@@ -1,75 +1,336 @@
 {{-- resources/views/admin/products/create.blade.php --}}
+@extends('admin.layouts.app')
 
-@extends('admin.layouts.app') {{-- SESUAIKAN DENGAN LOKASI LAYOUT UTAMA ADMIN KAMU --}}
+@section('title', 'Tambah Produk Baru')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Tambah Produk Baru</h1>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Tambah Produk Baru</h4>
+                </div>
+                <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+                    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
+                        @csrf
+                        
+                        {{-- Basic Product Information --}}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category_id" class="form-label">Kategori</label>
+                                    <select class="form-select" id="category_id" name="category_id" required>
+                                        <option value="">Pilih Kategori</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nama Produk</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
+                                </div>
+                            </div>
+                        </div>
 
-            <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="mb-3">
-                    <label for="category_id" class="form-label">Kategori</label>
-                    <select class="form-control" id="category_id" name="category_id" required>
-                        <option value="">Pilih Kategori</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="slug" class="form-label">Slug</label>
+                                    <input type="text" class="form-control" id="slug" name="slug" value="{{ old('slug') }}" required>
+                                    <small class="form-text text-muted">Akan digunakan di URL, contoh: t-shirt-keren</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="origin" class="form-label">Asal Produk</label>
+                                    <select class="form-select" id="origin" name="origin">
+                                        <option value="">Pilih Asal</option>
+                                        @foreach(['Indonesia', 'China', 'Vietnam', 'India', 'USA', 'Turkey', 'Bangladesh'] as $origin)
+                                            <option value="{{ $origin }}" {{ old('origin') == $origin ? 'selected' : '' }}>
+                                                {{ $origin }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                        </div>
+
+                        {{-- Image Upload --}}
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Gambar Produk (.PNG Only)</label>
+                            <input type="file" class="form-control" id="image" name="image" accept=".png">
+                            <small class="form-text text-muted">Hanya file PNG yang diperbolehkan. Maksimal 2MB.</small>
+                        </div>
+
+                        {{-- Price and Stock --}}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Harga</label>
+                                    <input type="number" class="form-control" id="price" name="price" value="{{ old('price') }}" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="stock" class="form-label">Stok</label>
+                                    <input type="number" class="form-control" id="stock" name="stock" value="{{ old('stock') }}" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Vibe Attributes Section --}}
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Vibe Attributes (untuk pencarian vibe)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    {{-- Occasion --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Occasion</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['casual', 'formal', 'party', 'work', 'sport', 'vacation', 'daily'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_occasion[]" 
+                                                           value="{{ $option }}" id="occasion_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_occasion', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="occasion_{{ $option }}">
+                                                        {{ ucfirst($option) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Style --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Style</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['vintage', 'modern', 'classic', 'trendy', 'minimalist', 'bohemian', 'streetwear'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_style[]" 
+                                                           value="{{ $option }}" id="style_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_style', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="style_{{ $option }}">
+                                                        {{ ucfirst($option) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    {{-- Material --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Material</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['cotton', 'polyester', 'wool', 'silk', 'linen', 'denim', 'leather', 'viscose'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_material[]" 
+                                                           value="{{ $option }}" id="material_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_material', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="material_{{ $option }}">
+                                                        {{ ucfirst($option) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Color Tone --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Color Tone</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['bright', 'pastel', 'dark', 'neutral', 'earth', 'neon', 'metallic'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_color_tone[]" 
+                                                           value="{{ $option }}" id="color_tone_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_color_tone', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="color_tone_{{ $option }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $option)) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    {{-- Fit --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Fit</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['slim', 'regular', 'loose', 'oversized', 'fitted', 'relaxed'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_fit[]" 
+                                                           value="{{ $option }}" id="fit_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_fit', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="fit_{{ $option }}">
+                                                        {{ ucfirst($option) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Pattern --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Pattern</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['solid', 'striped', 'floral', 'geometric', 'abstract', 'polka_dots', 'checkered'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_pattern[]" 
+                                                           value="{{ $option }}" id="pattern_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_pattern', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="pattern_{{ $option }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $option)) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    {{-- Neckline --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Neckline</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['round', 'v_neck', 'crew', 'scoop', 'high_neck', 'off_shoulder', 'halter'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_neckline[]" 
+                                                           value="{{ $option }}" id="neckline_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_neckline', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="neckline_{{ $option }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $option)) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Sleeve Length --}}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Sleeve Length</label>
+                                        <div class="checkbox-group">
+                                            @foreach(['sleeveless', 'short_sleeve', 'long_sleeve', '3_quarter', 'cap_sleeve'] as $option)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="vibe_sleeve_length[]" 
+                                                           value="{{ $option }}" id="sleeve_length_{{ $option }}"
+                                                           {{ in_array($option, old('vibe_sleeve_length', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="sleeve_length_{{ $option }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $option)) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- General Tags Section --}}
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">General Tags</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="checkbox-group">
+                                            @foreach(['comfortable', 'elegant', 'sporty', 'sexy', 'professional', 'casual_wear', 'evening_wear'] as $option)
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" name="general_tags[]" 
+                                                           value="{{ $option }}" id="general_tag_{{ $option }}"
+                                                           {{ in_array($option, old('general_tags', [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="general_tag_{{ $option }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $option)) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Product Status --}}
+                        <div class="mt-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" 
+                                       {{ old('is_active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">Produk Aktif</label>
+                            </div>
+                        </div>
+
+                        {{-- Submit Buttons --}}
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Simpan Produk</button>
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nama Produk</label>
-                    <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
-                </div>
-                <div class="mb-3">
-                    <label for="slug" class="form-label">Slug</label>
-                    <input type="text" class="form-control" id="slug" name="slug" value="{{ old('slug') }}" required>
-                    <small class="form-text text-muted">Akan digunakan di URL, contoh: t-shirt-keren</small>
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Deskripsi</label>
-                    <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="image" class="form-label">Gambar Produk</label>
-                    <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
-                    <small class="form-text text-muted">Maksimal 2MB (JPG, PNG, GIF, SVG)</small>
-                </div>
-                <div class="mb-3">
-                    <label for="price" class="form-label">Harga</label>
-                    <input type="number" class="form-control" id="price" name="price" value="{{ old('price') }}" step="0.01" min="0" required>
-                </div>
-                <div class="mb-3">
-                    <label for="stock" class="form-label">Stok</label>
-                    <input type="number" class="form-control" id="stock" name="stock" value="{{ old('stock') }}" min="0" required>
-                </div>
-                <div class="mb-3">
-                    <label for="metadata" class="form-label">Metadata (JSON)</label>
-                    <textarea class="form-control" id="metadata" name="metadata" rows="5" placeholder='{"warna": "merah", "ukuran": ["S", "M"]}'>{{ old('metadata') }}</textarea>
-                    <small class="form-text text-muted">Input dalam format JSON, contoh: `{"merek": "ABC", "garansi": "1 tahun"}`</small>
-                </div>
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="is_active">Produk Aktif</label>
-                </div>
-                <button type="submit" class="btn btn-primary">Simpan Produk</button>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+.checkbox-group {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+.checkbox-group .form-check {
+    margin-bottom: 0.25rem;
+}
+
+.card-header {
+    background-color: #e3f2fd;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-generate slug from product name
+    const nameInput = document.getElementById('name');
+    const slugInput = document.getElementById('slug');
+    
+    nameInput.addEventListener('input', function() {
+        const slug = this.value
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim('-');
+        slugInput.value = slug;
+    });
+});
+</script>
 @endsection

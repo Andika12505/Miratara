@@ -1,486 +1,504 @@
-/* CSS untuk Admin Dashboard MiraTara */
-/* File: admin/css_admin/admin.css */
+/* public/css/admin/admin.css */
 
-/* Admin Navbar */
-.navbar-light .navbar-brand {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: #000;
+/* ==========================================================================
+   MIRATARA ADMIN PANEL STYLES
+   ========================================================================== */
+
+/* Root Variables */
+:root {
+    --admin-primary: #007bff;
+    --admin-secondary: #6c757d;
+    --admin-success: #28a745;
+    --admin-info: #17a2b8;
+    --admin-warning: #ffc107;
+    --admin-danger: #dc3545;
+    --admin-light: #f8f9fa;
+    --admin-dark: #343a40;
+    --admin-sidebar-bg: #343a40;
+    --admin-sidebar-text: #adb5bd;
+    --admin-sidebar-active: #495057;
+    --admin-border: #dee2e6;
+    --admin-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --admin-shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.navbar-brand-wrapper {
-  position: relative;
-}
-
-.admin-title {
-  color: #ffc0cb;
-  font-weight: 600;
-}
-
-.admin-dropdown {
-  color: #666777;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.admin-dropdown:hover {
-  color: #000;
-}
-
-/* Override navbar untuk center logo */
-.navbar-brand {
-  margin-right: 0 !important;
-}
-
-.navbar-light .navbar-nav .nav-link {
-  color: #666777;
-}
-
-.navbar-light .navbar-nav .nav-link:hover {
-  color: #000;
-}
-
-/* Memberi ruang di atas untuk navbar yang fixed */
+/* General Overrides */
 body {
-    padding-top: 56px; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--admin-light);
+    line-height: 1.6;
 }
 
-.sidebar {
-    /* Membuat sidebar "menempel" di kiri layar */
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 100; /* Posisinya di belakang navbar */
-    padding-top: 56px; /* Memberi ruang untuk navbar di atasnya */
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    width: 250px; /* TENTUKAN LEBAR PASTI UNTUK SIDEBAR */
+/* ==========================================================================
+   ADMIN CARDS AND CONTENT
+   ========================================================================== */
+
+.admin-card {
+    background-color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: var(--admin-shadow);
+    margin-bottom: 1.5rem;
 }
 
-/* Konten utama di sebelah kanan sidebar */
-.main-content {
-    /* Beri margin kiri seukuran lebar sidebar */
-    margin-left: 250px; 
-    padding: 20px;
+.admin-card .card-header {
+    background-color: var(--admin-light);
+    border-bottom: 1px solid var(--admin-border);
+    border-radius: 0.5rem 0.5rem 0 0;
+    padding: 1rem 1.25rem;
 }
 
-/* ============================================= */
-/* == STYLING TAMPILAN (DARI ANDA) == */
-/* ============================================= */
-
-/* Anda bisa menyimpan semua styling Anda di bawah sini. */
-/* Saya hanya akan menimpa styling sidebar yang berkonflik. */
-
-/* Styling Sidebar Anda (sudah bagus) */
-.sidebar-content {
-  padding: 20px 15px;
-}
-.sidebar-title {
-  color: #495057; font-size: 0.9rem; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #dee2e6;
-}
-.sidebar .nav-link {
-  color: #6c757d; padding: 12px 15px; margin-bottom: 5px;
-  border-radius: 8px; transition: all 0.3s ease; font-weight: 500;
-}
-.sidebar .nav-link:hover {
-  color: #495057; background-color: #e9ecef; transform: translateX(5px);
-}
-.sidebar .nav-link.active {
-  color: #fff; background-color: #ffc0cb; border: none;
-}
-.sidebar .nav-link.active:hover {
-  background-color: #ff8fab; transform: translateX(5px);
-}
-.sidebar .nav-link i {
-  width: 20px; text-align: center;
-}
-/* ... (SEMUA KODE STYLING ANDA YANG LAIN SEPERTI CARD, BUTTON, DLL BISA DITARUH DI SINI) ... */
-
-
-/* ============================================= */
-/* == RESPONSIVE DESIGN (PENTING) == */
-/* ============================================= */
-
-/* Aturan untuk layar kecil (di bawah 768px) */
-@media (max-width: 767.98px) {
-  .sidebar {
-    /* Di layar kecil, biarkan sidebar dikontrol oleh Bootstrap Offcanvas */
-    /* Tidak perlu aturan khusus di sini, karena sudah dihandle HTML */
-  }
-
-  .main-content {
-    /* Di layar kecil, margin kiri dihilangkan agar konten memenuhi layar */
-    margin-left: 0;
-    padding: 15px;
-  }
+.admin-card .card-header h5 {
+    margin: 0;
+    color: var(--admin-dark);
+    font-weight: 600;
 }
 
-/* Main Content */
-.main-content {
-  padding: 20px;
+/* ==========================================================================
+   TABLES
+   ========================================================================== */
+
+.admin-table {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: var(--admin-shadow);
 }
 
-/* Welcome Header */
-.welcome-header {
-  background: linear-gradient(135deg, #ffc0cb 0%, #ff8fab 100%);
-  padding: 25px;
-  border-radius: 12px;
-  color: white;
-  margin-bottom: 25px;
-}
-
-.welcome-header h1 {
-  margin-bottom: 5px;
-  font-weight: 600;
-}
-
-.welcome-header p {
-  margin-bottom: 0;
-  opacity: 0.9;
-}
-
-/* Stats Cards */
-.stats-card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.stats-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-}
-
-.stats-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-}
-
-.stats-icon.bg-primary {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-}
-
-.stats-icon.bg-success {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-}
-
-.stats-icon.bg-warning {
-  background: linear-gradient(135deg, #ffc107, #e0a800);
-}
-
-.stats-icon.bg-info {
-  background: linear-gradient(135deg, #17a2b8, #117a8b);
-}
-
-/* Cards */
-.card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-  border-radius: 12px 12px 0 0 !important;
-  padding: 15px 20px;
-}
-
-.card-title {
-  color: #495057;
-  font-weight: 600;
-}
-
-.card-body {
-  padding: 20px;
-}
-
-/* Quick Actions Buttons */
-.btn {
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn-outline-primary:hover {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-
-.btn-outline-success:hover {
-  background-color: #28a745;
-  border-color: #28a745;
-}
-
-.btn-outline-info:hover {
-  background-color: #17a2b8;
-  border-color: #17a2b8;
-}
-
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  border-color: #dc3545;
-}
-
-/* System Info */
-.system-info {
-  font-size: 0.9rem;
-}
-
-.info-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: space-between;
-}
-
-.info-item:last-child {
-  border-bottom: none;
-}
-
-.info-item strong {
-  color: #495057;
-}
-
-/* Dropdown Menu */
-.dropdown-menu {
-  border: none;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-}
-
-.dropdown-item {
-  padding: 10px 20px;
-  transition: background-color 0.3s ease;
-}
-
-.dropdown-item:hover {
-  background-color: #f8f9fa;
-}
-
-.dropdown-divider {
-  margin: 5px 0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .sidebar {
-    min-height: auto;
-    border-right: none;
-    border-bottom: 1px solid #dee2e6;
-  }
-
-  .sidebar-content {
-    padding: 15px;
-  }
-
-  .sidebar .nav {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-
-  .sidebar .nav-item {
-    white-space: nowrap;
-    margin-right: 10px;
-  }
-
-  .sidebar .nav-link {
+.admin-table .table {
     margin-bottom: 0;
-  }
+}
 
-  .main-content {
-    padding: 15px;
-  }
+.admin-table .table thead th {
+    background-color: var(--admin-light);
+    border-top: none;
+    border-bottom: 2px solid var(--admin-border);
+    font-weight: 600;
+    color: var(--admin-dark);
+    padding: 1rem 0.75rem;
+}
 
-  .welcome-header {
-    padding: 20px;
+.admin-table .table tbody td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #f1f3f4;
+}
+
+.admin-table .table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn-admin-primary {
+    background-color: var(--admin-primary);
+    border-color: var(--admin-primary);
+    color: #fff;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-admin-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-admin-success {
+    background-color: var(--admin-success);
+    border-color: var(--admin-success);
+    color: #fff;
+    font-weight: 500;
+}
+
+.btn-admin-success:hover {
+    background-color: #1e7e34;
+    border-color: #1e7e34;
+    color: #fff;
+}
+
+.btn-admin-danger {
+    background-color: var(--admin-danger);
+    border-color: var(--admin-danger);
+    color: #fff;
+    font-weight: 500;
+}
+
+.btn-admin-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+    color: #fff;
+}
+
+.btn-admin-outline {
+    border: 2px solid var(--admin-primary);
+    color: var(--admin-primary);
+    background-color: transparent;
+    font-weight: 500;
+}
+
+.btn-admin-outline:hover {
+    background-color: var(--admin-primary);
+    color: #fff;
+}
+
+/* ==========================================================================
+   FORMS
+   ========================================================================== */
+
+.admin-form .form-label {
+    font-weight: 600;
+    color: var(--admin-dark);
+    margin-bottom: 0.5rem;
+}
+
+.admin-form .form-control {
+    border: 1px solid #d1d3e2;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.admin-form .form-control:focus {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.admin-form .form-select {
+    border: 1px solid #d1d3e2;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.admin-form .form-select:focus {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* ==========================================================================
+   BADGES AND STATUS
+   ========================================================================== */
+
+.admin-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+.admin-badge.status-active {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.admin-badge.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.admin-badge.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* ==========================================================================
+   PAGINATION
+   ========================================================================== */
+
+.admin-pagination .pagination {
+    margin-bottom: 0;
+}
+
+.admin-pagination .page-link {
+    color: var(--admin-primary);
+    border: 1px solid var(--admin-border);
+    padding: 0.5rem 0.75rem;
+}
+
+.admin-pagination .page-link:hover {
+    background-color: var(--admin-light);
+    border-color: var(--admin-primary);
+}
+
+.admin-pagination .page-item.active .page-link {
+    background-color: var(--admin-primary);
+    border-color: var(--admin-primary);
+}
+
+/* ==========================================================================
+   ALERTS
+   ========================================================================== */
+
+.admin-alert {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+}
+
+.admin-alert.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left-color: var(--admin-success);
+}
+
+.admin-alert.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left-color: var(--admin-danger);
+}
+
+.admin-alert.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left-color: var(--admin-warning);
+}
+
+.admin-alert.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left-color: var(--admin-info);
+}
+
+/* ==========================================================================
+   STATISTICS CARDS
+   ========================================================================== */
+
+.admin-stat-card {
+    background: linear-gradient(135deg, var(--admin-primary) 0%, #0056b3 100%);
+    color: #fff;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+}
+
+.admin-stat-card .stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.admin-stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.admin-stat-card .stat-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.admin-stat-card.stat-success {
+    background: linear-gradient(135deg, var(--admin-success) 0%, #1e7e34 100%);
+}
+
+.admin-stat-card.stat-warning {
+    background: linear-gradient(135deg, var(--admin-warning) 0%, #d39e00 100%);
+}
+
+.admin-stat-card.stat-danger {
+    background: linear-gradient(135deg, var(--admin-danger) 0%, #c82333 100%);
+}
+
+/* ==========================================================================
+   SEARCH AND FILTERS
+   ========================================================================== */
+
+.admin-search-bar {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: var(--admin-shadow);
+    margin-bottom: 1.5rem;
+}
+
+.admin-search-bar .input-group {
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.admin-search-bar .form-control {
+    border-right: none;
+    border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.admin-search-bar .btn {
+    border-left: none;
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+/* ==========================================================================
+   PRODUCT FORM SPECIFIC STYLES
+   ========================================================================== */
+
+.checkbox-group {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--admin-border);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    background-color: #fafbfc;
+    margin-bottom: 0.5rem;
+}
+
+.checkbox-group .form-check {
+    margin-bottom: 0.5rem;
+}
+
+.checkbox-group .form-check:last-child {
+    margin-bottom: 0;
+}
+
+.checkbox-group .form-check-input:checked {
+    background-color: var(--admin-primary);
+    border-color: var(--admin-primary);
+}
+
+.selection-counter {
+    font-size: 0.8rem;
+    font-weight: 500;
     text-align: center;
-  }
-
-  .stats-card {
-    margin-bottom: 15px;
-  }
+    padding: 0.25rem;
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
 }
 
-@media (max-width: 576px) {
-  .navbar-brand {
-    font-size: 1rem;
-  }
-
-  .navbar-brand img {
-    height: 25px;
-  }
-
-  .welcome-header h1 {
-    font-size: 1.5rem;
-  }
-
-  .stats-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
-  }
-
-  .card-body {
-    padding: 15px;
-  }
+.vibe-attributes-card {
+    background-color: #fff;
+    border: 1px solid var(--admin-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
 
-/* Loading Animation */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
+.vibe-attributes-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-bottom: none;
+    padding: 1rem 1.25rem;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .admin-main-content {
+        padding: 1rem;
+    }
+    
+    .admin-card {
+        margin-bottom: 1rem;
+    }
+    
+    .admin-stat-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .admin-stat-card .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .admin-table {
+        font-size: 0.875rem;
+    }
+    
+    .checkbox-group {
+        max-height: 150px;
+    }
 }
 
-.card,
-.stats-card {
-  animation: fadeIn 0.5s ease-out;
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+.admin-shadow {
+    box-shadow: var(--admin-shadow) !important;
 }
 
-/* Custom Scrollbar untuk Sidebar */
-.sidebar::-webkit-scrollbar {
-  width: 6px;
+.admin-shadow-lg {
+    box-shadow: var(--admin-shadow-lg) !important;
 }
 
-.sidebar::-webkit-scrollbar-track {
-  background: #f1f1f1;
+.admin-border-radius {
+    border-radius: 0.5rem !important;
 }
 
-.sidebar::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+.admin-text-primary {
+    color: var(--admin-primary) !important;
 }
 
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+.admin-bg-light {
+    background-color: var(--admin-light) !important;
 }
 
-/* Password Requirements untuk Add User */
-.password-requirements {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 12px;
-  border: 1px solid #e9ecef;
+/* Loading States */
+.admin-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
 }
 
-.requirements-list {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 0;
-  margin-top: 5px;
+.admin-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top-color: var(--admin-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
 }
 
-.req-item {
-  padding: 2px 0;
-  font-size: 0.85rem;
-  position: relative;
-  padding-left: 20px;
-  transition: 0.3s;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.req-item:before {
-  content: "✗";
-  position: absolute;
-  left: 0;
-  color: #dc3545;
-  font-weight: bold;
-}
-
-.req-item.valid:before {
-  content: "✓";
-  color: #28a745;
-}
-
-.req-item.valid {
-  color: #28a745;
-}
-
-.req-item.invalid {
-  color: #dc3545;
-}
-
-/* Form Validation */
-.was-validated .form-control:valid,
-.form-control.is-valid {
-  border-color: #28a745;
-  padding-right: calc(1.5em + 0.75rem);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.8.94 4.2-4.94L6.21 1.9 3.1 4.33 1.92 3.1z'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.was-validated .form-control:invalid,
-.form-control.is-invalid {
-  border-color: #dc3545;
-  padding-right: calc(1.5em + 0.75rem);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 1.4 1.4M6.2 7.4l1.4-1.4'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.invalid-feedback {
-  width: 100%;
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: #dc3545;
-}
-
-/* Input Group dengan Button Toggle */
-.input-group .btn {
-  border-left: 0;
-}
-
-/* Alert Styling */
-.alert {
-  border: none;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.alert-success {
-  background-color: rgba(40, 167, 69, 0.1);
-  color: #155724;
-  border-left: 4px solid #28a745;
-}
-
-.alert-danger {
-  background-color: rgba(220, 53, 69, 0.1);
-  color: #721c24;
-  border-left: 4px solid #dc3545;
-}
-
-.alert-warning {
-  background-color: rgba(255, 193, 7, 0.1);
-  color: #856404;
-  border-left: 4px solid #ffc107;
+/* Print Styles */
+@media print {
+    .admin-sidebar,
+    .admin-navbar,
+    .btn,
+    .admin-search-bar {
+        display: none !important;
+    }
+    
+    .admin-main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
 }
