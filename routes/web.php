@@ -8,13 +8,13 @@ use App\Http\Controllers\ProductController as PublicProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\StockManagementController;
 use App\Http\Controllers\CustomerAccountController;
 use App\Http\Controllers\CustomerServiceController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\AdminDashboardController; 
-
 
 /*
 |--------------------------------------------------------------------------
@@ -78,15 +78,49 @@ Route::middleware(['auth'])->group(function () {
 | Rute untuk Admin Panel
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
     
-    // UBAH ATAU PASTIKAN ROUTE INI ADA
+    // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // Manajemen User, Produk, Kategori
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);
+
+
+    // Stock Management Routes
+    Route::prefix('stock')->name('stock.')->group(function () {
+        // Main stock management pages
+        Route::get('/', [App\Http\Controllers\Admin\StockManagementController::class, 'index'])->name('index');
+        Route::get('/movements', [App\Http\Controllers\Admin\StockManagementController::class, 'movements'])->name('movements');
+        Route::get('/alerts', [App\Http\Controllers\Admin\StockManagementController::class, 'alerts'])->name('alerts');
+        Route::get('/reports', [App\Http\Controllers\Admin\StockManagementController::class, 'reports'])->name('reports');
+        
+        // Product stock management
+        Route::get('/product/{product}', [App\Http\Controllers\Admin\StockManagementController::class, 'show'])->name('show');
+        
+        // Stock operations
+        Route::post('/product/{product}/add', [App\Http\Controllers\Admin\StockManagementController::class, 'addStock'])->name('add');
+        Route::post('/product/{product}/remove', [App\Http\Controllers\Admin\StockManagementController::class, 'removeStock'])->name('remove');
+        Route::post('/product/{product}/adjust', [App\Http\Controllers\Admin\StockManagementController::class, 'adjustStock'])->name('adjust');
+        Route::post('/product/{product}/settings', [App\Http\Controllers\Admin\StockManagementController::class, 'updateSettings'])->name('update_settings');
+        
+        // Bulk operations
+        Route::post('/bulk-update', [App\Http\Controllers\Admin\StockManagementController::class, 'bulkUpdate'])->name('bulk_update');
+        
+        // Alert management
+        Route::post('/alerts/{alert}/acknowledge', [App\Http\Controllers\Admin\StockManagementController::class, 'acknowledgeAlert'])->name('acknowledge_alert');
+        Route::post('/alerts/{alert}/resolve', [App\Http\Controllers\Admin\StockManagementController::class, 'resolveAlert'])->name('resolve_alert');
+        
+        // Export functions
+        Route::get('/export', [App\Http\Controllers\Admin\StockManagementController::class, 'export'])->name('export');
+    });
+
+    // Dashboard AJAX routes
+    Route::get('/dashboard/stock-data', [AdminDashboardController::class, 'getStockData'])->name('dashboard.stock_data');
+    Route::post('/dashboard/quick-action', [AdminDashboardController::class, 'quickStockAction'])->name('dashboard.quick_action');
+    Route::get('/dashboard/analytics', [AdminDashboardController::class, 'stockAnalytics'])->name('dashboard.analytics');
     
     // Rute API/Data untuk Admin
     Route::get('/users-data', [UserController::class, 'getUsersJson'])->name('users.data');
